@@ -1,0 +1,26 @@
+<h1>Index</h1>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script type="text/javascript">
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://localhost:3000/addstudent",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/x-www-form-urlencoded",
+    "cache-control": "no-cache"
+  },
+  "data": {
+    "name": "harshit",
+    "regno": "123456",
+    "email": "hrshtvaish743@gmail.com",
+    "password": "123456789",
+    "phone": "9952552526"
+  }
+}
+window.onload = function () {
+$.ajax(settings).done(function (response) {
+console.log(response);
+});
+}
+</script>
