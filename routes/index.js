@@ -95,6 +95,8 @@ app.post('/addcourse', function(req, res) {
             newCourse.slot = req.body.slot;
             newCourse.faculties = req.body.faculties.split(',');
             newCourse.semester = req.body.sem;
+            newCourse.credits = req.body.credits;
+            newCourse.type = req.body.type;
             console.log(newCourse);
             newCourse.save(function(err) {
                 if (err) throw err;

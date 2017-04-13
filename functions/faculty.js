@@ -97,6 +97,18 @@ module.exports = {
                 }
             });
         });
+    },
+
+    postAttendance: function(req, res, emp_id) {
+        Faculty.findOne({
+            'empid': emp_id
+        }, function(err, faculty) {
+            if (err) throw err;
+            if (!faculty) failureResponse(req, res, 'Faculty not found!');
+            else {
+              
+            }
+        })
     }
 
 }

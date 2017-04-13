@@ -3,31 +3,36 @@ var bcrypt = require('bcrypt-nodejs');
 
 var Schema = mongoose.Schema;
 var courseSchema = new Schema({
-    name: {
+    regno: {
         type: String,
         required: true
     },
-    code: {
+    courseCode: {
         type: String,
-        required: true
-    },
-    semester: {
-        type: String,
-        required: true
-    },
-    faculties: {
-        type: [String],
         required: true
     },
     slot: {
         type: String,
         required: true
     },
-    credits : Number,
-    type: {
-        type: String,
-        required: true
-    },
+    attendance : [
+      {
+        slot: {
+            type: String,
+            required: true
+        },
+        date: {
+            type: String,
+            required: true
+        },
+        present : {
+          type : Boolean,
+          required : true
+        }
+      }
+    ]
+
+
 });
 
 var course = mongoose.model('Courses', courseSchema);

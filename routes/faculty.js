@@ -42,8 +42,8 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
             FacFunctions.getAccessToken(req, res, decoded.emp_id);
         } else if (req.params.param == 'getstudents') {
             FacFunctions.getStudentList(req, res, decoded.emp_id);
-        } else if (req.params.param == '') {
-
+        } else if (req.params.param == 'attendance') {
+            FacFunctions.postAttendance(req, res, decoded.emp_id);
         }
     } else {
         failureResponse(req, res, 'Not authenticated');
