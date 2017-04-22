@@ -54,7 +54,6 @@ module.exports = function(passport) {
             passReqToCallback: true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
         },
         function(req, empid, password, done) {
-            console.log(password);
             // asynchronous
             process.nextTick(function() {
                 Faculty.findOne({
@@ -63,6 +62,7 @@ module.exports = function(passport) {
                     // if there are any errors, return the error
                     if (err)
                         return done(err);
+                        console.log('here');
                     // if no user is found, return the message
                     if (!faculty)
                         return done(null, false, req.flash('FacultyloginMessage', 'No user found.'));

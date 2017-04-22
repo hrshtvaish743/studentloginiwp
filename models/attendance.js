@@ -6,7 +6,7 @@ var attendanceSchema = new Schema({
     facultyId : {
       type : String,
       required : true
-    }
+    },
     courseCode: {
         type: String,
         required: true
@@ -16,9 +16,9 @@ var attendanceSchema = new Schema({
         required: true
     },
     date : {
-      type : Date,
+      type : String,
       required : true
-    }
+    },
     attendance : [
       {
         regno: {
@@ -33,5 +33,5 @@ var attendanceSchema = new Schema({
     ]
 });
 
-var attendance = mongoose.model('Attendance', courseSchema);
+var attendance = mongoose.model('Attendance', attendanceSchema);
 module.exports = attendance;

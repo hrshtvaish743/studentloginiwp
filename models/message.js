@@ -8,7 +8,7 @@ var messageSchema = new Schema({
         required: true
     },
     to: {
-        type: String,
+        type: [String],
         required: true
     },
     date: {

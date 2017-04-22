@@ -111,17 +111,29 @@ app.post('/addcourse', function(req, res) {
 // LOGIN =================================
 
 app.post('/login/student', passport.authenticate('student-login', {
-    failureRedirect: '/login/student', // redirect back to the login page if there is an error
+    failureRedirect: '/login/fail', // redirect back to the login page if there is an error
     failureFlash: true, // allow flash messages
     session: false
 }), generateStudToken, respond);
 
 
 app.post('/login/faculty', passport.authenticate('faculty-login', {
-    failureRedirect: '/login/faculty', // redirect back to the login page if there is an error
+    failureRedirect: '/login/fail', // redirect back to the login page if there is an error
     failureFlash: true, // allow flash messages
     session: false
 }), generateToken, respond);
+
+app.get('/login/fail', function(req, res) {
+  res.json({
+    status :0,
+    message : "Login Failed! Check your username or password!"
+  });
+});
+app.get('/alldata', function(req, res) {
+  Faculty.find({}, function(err, fac) {
+    res.json(fac);
+  });
+});
 
 
 module.exports = app;
