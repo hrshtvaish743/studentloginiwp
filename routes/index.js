@@ -92,7 +92,7 @@ app.post('/addcourse', function(req, res) {
             var newCourse = new Course();
             newCourse.code = req.body.code;
             newCourse.name = req.body.name;
-            newCourse.slot = req.body.slot;
+            newCourse.slots = req.body.slots.split(',');
             newCourse.faculties = req.body.faculties.split(',');
             newCourse.semester = req.body.sem;
             newCourse.credits = req.body.credits;

@@ -19,7 +19,7 @@ var courseSchema = new Schema({
         type: [String],
         required: true
     },
-    slot: {
+    slots: {
         type: String,
         required: true
     },

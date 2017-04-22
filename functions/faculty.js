@@ -1,6 +1,7 @@
 var Student = require('../models/student');
 var Faculty = require('../models/faculty');
 var Course = require('../models/course');
+var Attendance = require('../models/attendance');
 var jwt = require('jsonwebtoken');
 var config = require('../config/config.js');
 var shortid = require('shortid');
@@ -106,10 +107,43 @@ module.exports = {
             if (err) throw err;
             if (!faculty) failureResponse(req, res, 'Faculty not found!');
             else {
-              
+              Attendance.find({'facultyId' : faculty.empid}, function(err, data) {
+                if(err) throw err;
+                if(!data || data[0] == undefined) {
+
+                }
+              })
             }
         })
-    }
+    },
+
+    getAttendance : function(req, res, emp_id) {
+      Faculty.findOne({
+          'empid': emp_id
+      }, function(err, faculty) {
+          if (err) throw err;
+          if (!faculty) failureResponse(req, res, 'Faculty not found!');
+          else {
+            Attendance.findOne({'facultyId' : faculty.empid, 'courseCode' : req.body.course, 'date' : req.body.date}, function(err, data) {
+              if(err) throw err;
+              if(!data || data[0] == undefined) {
+                attendance = new Attendance();
+                attendance.facultyId = faculty.empid;
+                attendance.data = req.body.date;
+                attendance.slot = req.body.slot;
+                attendance.courseCode = req.body.course;
+                attendance.attendance = req.body.attendance;
+                attendance.save(function(err) {
+                  if(err) throw err;
+                  res.send('attendance saved');
+                });
+              } else {
+                res.send('attendance already updated');
+              }
+            })
+          }
+      });
+    },
 
 }
 

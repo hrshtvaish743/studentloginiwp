@@ -2,11 +2,11 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 
 var Schema = mongoose.Schema;
-var courseSchema = new Schema({
-    regno: {
-        type: String,
-        required: true
-    },
+var attendanceSchema = new Schema({
+    facultyId : {
+      type : String,
+      required : true
+    }
     courseCode: {
         type: String,
         required: true
@@ -15,25 +15,23 @@ var courseSchema = new Schema({
         type: String,
         required: true
     },
+    date : {
+      type : Date,
+      required : true
+    }
     attendance : [
       {
-        slot: {
+        regno: {
             type: String,
             required: true
         },
-        date: {
-            type: String,
+        present: {
+            type: Boolean,
             required: true
-        },
-        present : {
-          type : Boolean,
-          required : true
         }
       }
     ]
-
-
 });
 
-var course = mongoose.model('Courses', courseSchema);
-module.exports = course;
+var attendance = mongoose.model('Attendance', courseSchema);
+module.exports = attendance;
