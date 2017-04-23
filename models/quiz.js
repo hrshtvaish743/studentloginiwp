@@ -24,7 +24,7 @@ var quizSchema = new Schema({
     required: true
   },
   date: {
-    type: Date,
+    type: String,
     required: true
   },
   startTime: {
@@ -46,9 +46,8 @@ var quizSchema = new Schema({
   questions : [
     {
       questionId : {
-        type : String,
-        required : true
-      }
+        type : String
+      },
       question : {
         type : String
       },

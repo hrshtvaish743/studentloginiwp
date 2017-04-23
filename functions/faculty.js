@@ -3,6 +3,7 @@ var Faculty = require('../models/faculty');
 var Course = require('../models/course');
 var Attendance = require('../models/attendance');
 var Message = require('../models/message');
+var Quiz = require('../models/quiz');
 var jwt = require('jsonwebtoken');
 var config = require('../config/config.js');
 var shortid = require('shortid');
@@ -226,7 +227,7 @@ module.exports = {
               to.push(students[i].regno);
             }
             newMessage = new Message();
-            newMessage.from = faculty.id;
+            newMessage.from = faculty.empid;
             newMessage.to = to;
             newMessage.date = req.body.date;
             newMessage.message = req.body.message;
@@ -252,7 +253,7 @@ module.exports = {
       if (err) throw err;
       else {
         newMessage = new Message();
-        newMessage.from = faculty.id;
+        newMessage.from = faculty.empid;
         newMessage.to.push(req.body.to);
         newMessage.date = req.body.date;
         newMessage.message = req.body.message;
@@ -269,6 +270,159 @@ module.exports = {
     });
   },
 
+  getQuizes: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.find({}, function(err, quizes) {
+          if (err) throw err;
+          if (!quizes || quizes[0] == undefined) {
+            failureResponse(req, res, 'No quiz added yet!');
+          } else {
+            res.json({
+              status: 1,
+              quizes: quizes,
+              newToken: req.token
+            })
+          }
+        })
+      }
+    })
+  },
+
+  addQuiz: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        newQuiz = new Quiz();
+        newQuiz.quizId = shortid.generate();
+        newQuiz.name = req.body.name;
+        newQuiz.courseCode = req.body.course;
+        newQuiz.facultyId = faculty.empid;
+        newQuiz.slot = req.body.slot;
+        newQuiz.date = req.body.date;
+        newQuiz.startTime = req.body.startTime;
+        newQuiz.endTime = req.body.endTime;
+        newQuiz.numberOfAttempts = req.body.numberOfAttempts;
+        newQuiz.numberOfQuestions = req.body.numberOfQuestions;
+        console.log(newQuiz);
+        newQuiz.save(function(err) {
+          if (err) throw err;
+          res.json({
+            status: 1,
+            message: 'Quiz Added!',
+            newToken: req.token
+          });
+        });
+      }
+    });
+  },
+
+  addQuizQuestion: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOne({
+          'quizId': req.body.quizid
+        }, function(err, quiz) {
+          if (err) throw err;
+          else {
+            var question = {
+              questionId: shortid.generate(),
+              question: req.body.question,
+              options: req.body.options,
+              answer: req.body.answer
+            };
+            quiz.questions.push(question);
+            console.log(quiz);
+            quiz.save(function(err) {
+              if (err) throw err;
+              res.json({
+                status: 1,
+                message: 'Question added to the quiz',
+                quiz: quiz,
+                newToken: req.token
+              });
+            });
+          }
+        })
+      }
+    });
+  },
+
+  deleteQuizQuestion: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOne({
+          'quizId': req.body.quizid
+        }, function(err, quiz) {
+          if (err) throw err;
+          else {
+            var questions = [];
+            for (i = 0; i < quiz.questions.length; i++) {
+              if (quiz.questions[i].questionId != req.body.questionId) {
+                questions.push(quiz.questions[i]);
+              }
+            }
+            quiz.questions = questions;
+            quiz.save(function(err) {
+              if (err) throw err;
+              res.json({
+                status: 1,
+                message: 'Question Deleted',
+                quiz: quiz,
+                newToken: req.token
+              })
+            })
+          }
+        })
+      }
+    })
+  },
+
+  updateQuizQuestion: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOne({
+          'quizId': req.body.quizid
+        }, function(err, quiz) {
+          if (err) throw err;
+          else {
+            var questions = [];
+            for (i = 0; i < quiz.questions.length; i++) {
+              if (quiz.questions[i].questionId != req.body.questionId) {
+                questions.push(quiz.questions[i]);
+              } else {
+                questions.push(req.body.question);
+              }
+            }
+            quiz.questions = questions;
+            quiz.save(function(err) {
+              if (err) throw err;
+              res.json({
+                status: 1,
+                message: 'Question updated',
+                quiz: quiz,
+                newToken: req.token
+              })
+            })
+          }
+        })
+      }
+    })
+  }
 
 }
 

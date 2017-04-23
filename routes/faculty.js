@@ -29,6 +29,8 @@ app.get('/:param', authenticate, refreshToken, function(req, res) {
       FacFunctions.GetRegisteredCourses(req, res, decoded.emp_id);
     } else if (req.params.param == 'messages') {
       FacFunctions.getMessages(req, res, decoded.emp_id);
+    } else if (req.params.param == 'quiz') {
+      FacFunctions.getQuizes(req, res, decoded.emp_id);
     }
   } else {
     failureResponse(req, res, 'Not Authorized!');
@@ -47,14 +49,18 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
       FacFunctions.postAttendance(req, res, decoded.emp_id);
     } else if (req.params.param == 'addquiz') {
       FacFunctions.addQuiz(req, res, decoded.emp_id);
-    } else if (req.params.param == 'addquestion') {
-      FacFunctions.addQuestion(req, res, decoded.emp_id);
+    } else if (req.params.param == 'addquizquestion') {
+      FacFunctions.addQuizQuestion(req, res, decoded.emp_id);
     } else if (req.params.param == 'getattendance') {
       FacFunctions.getAttendance(req, res, decoded.emp_id);
     } else if (req.params.param == 'sendmessage-group') {
       FacFunctions.sendGroupMessage(req, res, decoded.emp_id);
     } else if (req.params.param == 'sendmessage-ind') {
       FacFunctions.sendIndMessage(req, res, decoded.emp_id);
+    } else if (req.params.param == 'deletequizquestion') {
+      FacFunctions.deleteQuizQuestion(req, res, decoded.emp_id);
+    } else if (req.params.param == 'updatequizquestion') {
+      FacFunctions.updateQuizQuestion(req, res, decoded.emp_id);
     }
   } else {
     failureResponse(req, res, 'Not authenticated');
