@@ -7,6 +7,9 @@ var quizSchema = new Schema({
     type: String,
     required: true
   },
+  open : {
+    type : Boolean
+  },
   name: {
     type: String,
     required: true
@@ -27,11 +30,11 @@ var quizSchema = new Schema({
     type: String,
     required: true
   },
-  startTime: {
+  startDate: {
     type: String,
     required: true
   },
-  endTime: {
+  endDate: {
     type: String,
     required: true
   },
@@ -42,6 +45,10 @@ var quizSchema = new Schema({
   numberOfQuestions: {
     type: String,
     required: true
+  },
+  duration : {
+    type : String,
+    required : true
   },
   questions : [
     {
@@ -63,6 +70,9 @@ var quizSchema = new Schema({
       ],
       answer : {
         type : String
+      },
+      marks : {
+        type : Number
       }
     }
   ]

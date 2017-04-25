@@ -31,11 +31,13 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
     } else if (req.params.param == 'postdiscussion') {
       StudFunctions.postDiscussion(req, res, decoded.regno);
     } else if (req.params.param == 'attemptquiz') {
-      StudFunctions.selectQuiz(req, res, decoded.regno);
-    } else if (req.params.param == 'quiznextques') {
+      StudFunctions.attemptQuiz(req, res, decoded.regno);
+    } else if (req.params.param == 'nextques') {
       StudFunctions.nextQuestion(req, res, decoded.regno);
-    } else if (req.params.param = 'quizsubmit') {
+    } else if (req.params.param == 'quizsubmit') {
       StudFunctions.submitQuiz(req, res, decoded.regno);
+    } else if (req.params.param == 'getquizquestion') {
+      StudFunctions.getQuestion(req, res, decoded.regno);
     }
   } else {
     failureResponse(req, res, 'Not authorized!');
@@ -53,8 +55,6 @@ app.get('/:param', authenticate, refreshToken, function(req, res) {
       StudFunctions.getMessages(req, res, decoded.regno);
     } else if (req.params.param == 'quiz') {
       StudFunctions.getQuiz(req, res, decoded.regno);
-    } else if (req.params.param == 'attemptquiz') {
-      StudFunctions.attemptQuiz(req, res, decoded.regno);
     }
   } else {
     failureResponse(req, res, 'Not authorized!');

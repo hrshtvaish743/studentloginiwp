@@ -37,7 +37,6 @@ app.post('/addfac', function(req, res) {
             newFac.phone = req.body.phone;
             newFac.role = "faculty";
             newFac.password = newFac.generateHash(req.body.password);
-            console.log(req.body.empid);
             newFac.save(function(err) {
                 if (err) throw err;
                 res.json({
@@ -62,7 +61,6 @@ app.post('/addstudent', function(req, res) {
             newStud.phone = req.body.phone;
             newStud.role = "student";
             newStud.password = newStud.generateHash(req.body.password);
-            console.log(newStud);
             newStud.save(function(err) {
                 if (err) throw err;
                 res.json({
@@ -97,7 +95,6 @@ app.post('/addcourse', function(req, res) {
             newCourse.semester = req.body.sem;
             newCourse.credits = req.body.credits;
             newCourse.type = req.body.type;
-            console.log(newCourse);
             newCourse.save(function(err) {
                 if (err) throw err;
                 res.json({

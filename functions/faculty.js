@@ -150,7 +150,6 @@ module.exports = {
             attendance.slot = req.body.slot;
             attendance.courseCode = req.body.course;
             attendance.attendance = req.body.attendance;
-            console.log(attendance);
             attendance.save(function(err) {
               if (err) throw err;
               res.send(attendance);
@@ -231,7 +230,6 @@ module.exports = {
             newMessage.to = to;
             newMessage.date = req.body.date;
             newMessage.message = req.body.message;
-            console.log(newMessage);
             newMessage.save(function(err) {
               if (err) throw err;
               res.json({
@@ -257,7 +255,6 @@ module.exports = {
         newMessage.to.push(req.body.to);
         newMessage.date = req.body.date;
         newMessage.message = req.body.message;
-        console.log(newMessage);
         newMessage.save(function(err) {
           if (err) throw err;
           res.json({
@@ -305,11 +302,12 @@ module.exports = {
         newQuiz.facultyId = faculty.empid;
         newQuiz.slot = req.body.slot;
         newQuiz.date = req.body.date;
-        newQuiz.startTime = req.body.startTime;
-        newQuiz.endTime = req.body.endTime;
+        newQuiz.startDate = req.body.startDate;
+        newQuiz.endDate = req.body.endDate;
         newQuiz.numberOfAttempts = req.body.numberOfAttempts;
         newQuiz.numberOfQuestions = req.body.numberOfQuestions;
-        console.log(newQuiz);
+        newQuiz.duration = req.body.duration;
+        newQuiz.open = false;
         newQuiz.save(function(err) {
           if (err) throw err;
           res.json({
@@ -337,10 +335,10 @@ module.exports = {
               questionId: shortid.generate(),
               question: req.body.question,
               options: req.body.options,
-              answer: req.body.answer
+              answer: req.body.answer,
+              marks: req.body.marks
             };
             quiz.questions.push(question);
-            console.log(quiz);
             quiz.save(function(err) {
               if (err) throw err;
               res.json({
@@ -422,6 +420,56 @@ module.exports = {
         })
       }
     })
+  },
+
+  openQuiz: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOne({
+          'quizId': req.body.quizid
+        }, function(err, quiz) {
+          if (err) throw err;
+          else {
+            quiz.open = true;
+            quiz.save(function(err) {
+              res.json({
+                status : 1,
+                message : 'Quiz is now Live!',
+                newToken : req.token
+              });
+            });
+          }
+        });
+      }
+    });
+  },
+
+  closeQuiz: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOne({
+          'quizId': req.body.quizid
+        }, function(err, quiz) {
+          if (err) throw err;
+          else {
+            quiz.open = false;
+            quiz.save(function(err) {
+              res.json({
+                status : 1,
+                message : 'Quiz is now closed!',
+                newToken : req.token
+              });
+            });
+          }
+        });
+      }
+    });
   }
 
 }

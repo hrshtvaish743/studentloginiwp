@@ -62,7 +62,6 @@ module.exports = function(passport) {
                     // if there are any errors, return the error
                     if (err)
                         return done(err);
-                        console.log('here');
                     // if no user is found, return the message
                     if (!faculty)
                         return done(null, false, req.flash('FacultyloginMessage', 'No user found.'));

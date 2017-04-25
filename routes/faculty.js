@@ -61,6 +61,14 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
       FacFunctions.deleteQuizQuestion(req, res, decoded.emp_id);
     } else if (req.params.param == 'updatequizquestion') {
       FacFunctions.updateQuizQuestion(req, res, decoded.emp_id);
+    } else if (req.params.param == 'openquiz') {
+      FacFunctions.openQuiz(req, res, decoded.emp_id);
+    } else if (req.params.param == 'closequiz') {
+      FacFunctions.closeQuiz(req, res, decoded.emp_id);
+    } else if (req.params.param == 'postmarks') {
+      FacFunctions.postMarks(req, res, decoded.emp_id);
+    } else {
+      failureResponse(req, res, 'Not Found');
     }
   } else {
     failureResponse(req, res, 'Not authenticated');
