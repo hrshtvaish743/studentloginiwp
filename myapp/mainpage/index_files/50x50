@@ -1,0 +1,14 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE>Redirect</TITLE>
+ </HEAD>
+ <BODY>
+  <script>
+	var Url = document.location.search;
+	var path ="http://phc.prontonetworks.com/cgi-bin/authlogin"
+	var url = path.concat(Url);
+	window.location.href = url;
+  </script>
+ </BODY>
+</HTML>
