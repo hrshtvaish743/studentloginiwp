@@ -27,7 +27,17 @@ var courseSchema = new Schema({
         type: String,
         required: true
     },
-    venue : String
+    venue : String,
+    marksSplitUp : [
+      {
+        component : {
+          type : String
+        },
+        maxMarks : {
+          type : Number
+        }
+      }
+    ]
 });
 
 var course = mongoose.model('Courses', courseSchema);

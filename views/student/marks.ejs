@@ -8,22 +8,32 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
-        <table class="table table-bordered table-hover table-responsive text-center">
-          <thead>
-            <tr>
-              <th>S. No.</th>
-              <th>Course Name</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-        <table class="table table-bordered table-hover table-responsive text-center">
-          <thead>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
+        <% for(i = 0; i < student.courses.length; i++) { %>
+          <table class="table table-bordered table-hover table-responsive text-center">
+            <thead>
+              <th>
+                <%= i+1 %>
+              </th>
+              <th>
+                <%= student.courses[i].courseCode %>
+              </th>
+              <th>
+                <%= student.courses[i].courseName %>
+              </th>
+              <th>
+                <%= student.courses[i].type %>
+              </th>
+              <th>
+                <%= student.courses[i].courseSlot %>
+              </th>
+              <th>
+                <%= student.courses[i].courseFaculty %>
+              </th>
+            </thead>
+            <tbody id="<%= student.courses[i].courseSlot %>">
+            </tbody>
+          </table>
+          <% } %>
       </div>
     </div>
   </div>
@@ -32,9 +42,30 @@
   </div>
   <!-- /#wrapper -->
   <% include footer.ejs %>
-  <script src="/js/timetable.js" charset="utf-8"></script>
     <script type="text/javascript">
-
+    window.onload = function () {
+      var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "http://localhost:3000/student/marks",
+        "method": "POST",
+        "headers": {
+          "content-type": "application/x-www-form-urlencoded"
+        },
+        "data": ""
+      }
+      $.ajax(settings).done(function(response) {
+        var count = 1;
+        for(i=0; i<response.marks.length; i++) {
+          for(j=0; j < response.marks[i].marks.length; j++) {
+            var content = '<tr><td class="success" colspan="4">' + response.marks[i].component +
+            '</td><td class="danger" colspan="2">' + response.marks[i].marks[j].marks + '</td></tr>';
+            document.getElementById(response.marks[i].slot).innerHTML += content;
+          }
+        }
+        console.log(response);
+      });
+    }
     </script>
     </body>
 

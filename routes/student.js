@@ -45,6 +45,8 @@ app.post('/:param', isLoggedIn, function(req, res) {
       StudFunctions.submitQuiz(req, res, decoded.regno);
     } else if (req.params.param == 'getquizquestion') {
       StudFunctions.getQuestion(req, res, decoded.regno);
+    } else if (req.params.param == 'marks') {
+      StudFunctions.getMarks(req, res, decoded.regno);
     } else {
       failureResponse(req, res, 'Not Found');
     }
@@ -59,7 +61,9 @@ app.get('/:param', isLoggedIn, function(req, res) {
     if (req.params.param == 'timetable') {
       StudFunctions.getTimetable(req, res, decoded.regno);
     } else if (req.params.param == 'marks') {
-      StudFunctions.getMarks(req, res, decoded.regno);
+      res.render('student/marks', {
+        student : req.user
+      });
     } else if (req.params.param == 'messages') {
       StudFunctions.getMessages(req, res, decoded.regno);
     } else if (req.params.param == 'quiz') {

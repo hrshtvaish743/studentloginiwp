@@ -11,21 +11,12 @@ var marksSchema = new Schema({
         type: String,
         required: true
     },
-    marksSplitUp : [
-      {
-        component : {
-          type : String
-        },
-        maxMarks : {
-          type : Number
-        }
-      }
-    ],
+    slot : String,
+    component : String,
     marks : [
       {
         regno : String,
-        component : String
-
+        marks : String
       }
     ]
 });

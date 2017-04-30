@@ -1,0 +1,296 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Registered Students</h1>
+    </div>
+  </div>
+  <!-- /.container-fluid -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <table class="table table-bordered table-hover table-responsive text-center">
+          <thead>
+            <tr>
+              <th></th>
+              <th>S. No.</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Slot</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(i=0; i < faculty.courses.length; i++) { %>
+              <tr class="success">
+                <td>
+                  <a href="#splitModal" role="button" class="btn btn-large btn-default" data-toggle="modal" data-slot="<%= faculty.courses[i].slot %>" data-code="<%= faculty.courses[i].code %>" onclick="setCode(this);">Add Marks Component</a>
+                  <a href="#marksModal" role="button" class="btn btn-large btn-default" data-toggle="modal" data-slot="<%= faculty.courses[i].slot %>" data-code="<%= faculty.courses[i].code %>" onclick="setCode(this);">Post/Update Marks</a>
+                  <td>
+                    <%= i+1 %>
+                  </td>
+                  <td>
+                    <%= faculty.courses[i].code %>
+                  </td>
+                  <td>
+                    <%= faculty.courses[i].name %>
+                  </td>
+                  <td>
+                    <%= faculty.courses[i].slot %>
+                  </td>
+              </tr>
+              <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+
+
+  <!-- Modal HTML -->
+  <div id="splitModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Add Marks Component</h4>
+        </div>
+        <div id="component_response" class="modal-body">
+          <form id="component_form">
+            <input id="component" class="form-control" type="text" name="component" placeholder="Component Name"><br>
+            <input id="maxmarks" class="form-control" type="text" name="maxMarks" placeholder="Maximum Marks">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="addComponent();">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="marksModal" class="modal fade">
+    <div class="">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Post/Update Marks</h4>
+        </div>
+        <div id="marks_response" class="modal-body text-center">
+          <h3 id="loading" class="loading"></h3>
+          <div>
+            <h3>Select Component</h3>
+            <select id="components" class="form-control" name="component"></select>
+          </div><br>
+          <form id="marks_form">
+          <table id="table" class="table table-bordered table-hover table-responsive text-center">
+            <thead>
+              <tr>
+                <th>S. No.</th>
+                <th>Register Number</th>
+                <th>Name</th>
+                <th>Marks</th>
+              </tr>
+            </thead>
+            <tbody id="students"></tbody>
+          </table>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="postMarks();">Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      $('#table').hide();
+      var courseCode, slot, maxMarks;
+      var Marks;
+
+      function setCode(ob) {
+        Marks = [];
+        $('#components').hide();
+        $('#components').html("");
+        courseCode = $(ob).data('code');
+        slot = $(ob).data('slot');
+        if ($(ob).attr('href') == '#marksModal') {
+          getComponents(slot);
+        }
+      }
+
+      function getStudents(slot) {
+        $('#loading').html("Loading......");
+        $('#table').hide();
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/getstudents",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "slot": slot
+          }
+        }
+        $.ajax(settings).done(function(response) {
+          $('#students').html("");
+          for (i = 0; i < response.students.length; i++) {
+            var content = "<tr><td>" +
+              (i + 1) + "</td><td>" +
+              response.students[i].regno +
+              "</td><td>" +
+              response.students[i].name + "</td><td><input id=\"" + response.students[i].regno + "\" class=\"form-control\" type=\"text\" placeholder=\"Marks\" onkeyup=\"updateMarks(this.id, this.value);\"></td></tr>";
+            $('#students').append(content);
+            $('#loading').html("");
+            $('#table').show();
+          }
+        }, getMarks);
+      }
+
+
+      function updateMarks(regno, marks) {
+        var flag = 0,
+            index;
+        if (Marks.length > 0) {
+          for (i = 0; i < Marks.length; i++) {
+            if (Marks[i].regno == regno) {
+              flag = 1;
+              index = i;
+              break;
+            }
+          }
+          if (flag == 1) {
+            Marks[index].marks = marks;
+            index = undefined;
+          } else {
+            var temp = {
+              regno: regno,
+              marks: marks
+            };
+            Marks.push(temp);
+          }
+        } else {
+          var temp = {
+            regno: regno,
+            marks: marks
+          };
+          Marks.push(temp);
+        }
+      }
+
+      function getComponents(slot) {
+        $('#loading').html("Loading......");
+        $('#table').hide();
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/getcomponents",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "slot": slot
+          }
+        }
+        $.ajax(settings).done(function(response) {
+          if (response.components.length > 0) {
+            getStudents(slot);
+            for (i = 0; i < response.components.length; i++) {
+              var content = "<option value=\"" + response.components[i].component + "\" onclick=\"getMarks()\">" + response.components[i].component + " - " + response.components[i].maxMarks + "</option>";
+              maxMarks = response.components[i].maxMarks;
+              $('#components').append(content);
+            }
+
+          } else {
+            $('#loading').html("No marks component added");
+          }
+        });
+      }
+
+      function addComponent() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/addmarksplitup",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "slot": slot,
+            "code": courseCode,
+            "component": $('#component').val(),
+            "maxMarks": $('#maxmarks').val()
+          }
+        }
+        $.ajax(settings).done(function(response) {
+          alert(response.message);
+          $('#component_form').trigger("reset");
+          $("#splitModal").modal('hide');
+        });
+      }
+
+      function postMarks() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/postmarks",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "slot": slot,
+            "code": courseCode,
+            "component": $('#components').val(),
+            "marks": Marks
+          }
+        }
+        $.ajax(settings).done(function(response) {
+          alert(response.message);
+          $('#marks_form').trigger("reset");
+          $("#marksModal").modal('hide');
+        });
+      }
+
+      function getMarks() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/getmarks",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "slot": slot,
+            "code": courseCode,
+            "component": $('#components').val()
+          }
+        }
+        $.ajax(settings).done(function(response) {
+          console.log(response);
+          if(response.status != 0) {
+            if(response.marks.marks.length > 0) {
+              for(i = 0; i < response.marks.marks.length; i++) {
+                $('#' + response.marks.marks[i].regno).val(response.marks.marks[i].marks)
+              }
+            }
+            Marks = response.marks.marks;
+            $('#components').show();
+          } else {
+            $('#marks_form').trigger("reset");
+          }
+        });
+      }
+    </script>
+    </body>
+
+    </html>

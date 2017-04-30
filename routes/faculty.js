@@ -19,7 +19,6 @@ require('../passport/passport.js')(passport);
 
 // INDEX ===========================
 app.get('/', isLoggedIn, function(req, res) {
-  console.log(req.user);
   res.render('faculty/index', {
     faculty: req.user
   })
@@ -50,6 +49,10 @@ app.get('/:param', isLoggedIn, function(req, res) {
       req.logout();
       req.session.destroy();
       res.redirect("/");
+    } else if (req.params.param == 'marks') {
+      res.render('faculty/marks', {
+        faculty: req.user
+      });
     }
   } else {
     failureResponse(req, res, 'Not Authorized!');
@@ -91,7 +94,11 @@ app.post('/:param', isLoggedIn, function(req, res) {
     } else if (req.params.param == 'postmarks') {
       FacFunctions.postMarks(req, res, decoded.empid);
     } else if (req.params.param == 'addmarksplitup') {
-      FacFunctions.marksSplitUp(req, res, decoded.empid);
+      FacFunctions.addSplitUp(req, res, decoded.empid);
+    } else if (req.params.param == 'getcomponents') {
+      FacFunctions.GetComponents(req, res, decoded.empid);
+    } else if (req.params.param == 'getmarks') {
+      FacFunctions.getMarks(req, res, decoded.empid);
     } else {
       failureResponse(req, res, 'Not Found');
     }

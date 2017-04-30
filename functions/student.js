@@ -105,19 +105,47 @@ module.exports = {
       if (err) throw err;
       if (!student) failureResponse(req, res, 'Student not registered!');
       else {
+        var slots = [];
+        var faculties = [];
+        var courseCodes = [];
+        for(i = 0; i < student.courses.length; i++) {
+          slots.push(student.courses[i].courseSlot);
+          faculties.push(student.courses[i].facultyId);
+          courseCodes.push(student.courses[i].courseCode);
+        }
         Marks.find({
-          'regno': student.regno
+          slot : {
+            $in : slots
+          },
+          facultyId : {
+            $in : faculties
+          },
+          courseCode : {
+            $in : courseCodes
+          }
         }, function(err, marksData) {
           if (err) throw err;
-          if (!marksData) {
-            res.render('students/marks', {
-              marks: null,
-              student : req.user
+          if (!marksData || marksData[0] == undefined) {
+            res.json({
+              status : 0
             });
           } else {
-            res.render('student/marks', {
+            for(i = 0; i < marksData.length; i++) {
+              var marks = [];
+              for(j = 0; j < marksData[i].marks.length; j++) {
+                if(marksData[i].marks[j].regno == student.regno) {
+                  var temp = {
+                    regno : marksData[i].marks[j].regno,
+                    marks : marksData[i].marks[j].marks
+                  }
+                  marks.push(temp);
+                }
+              }
+              marksData[i].marks = marks;
+            }
+            res.json({
               marks: marksData,
-              student : req.user
+              status : 1
             });
           }
         });

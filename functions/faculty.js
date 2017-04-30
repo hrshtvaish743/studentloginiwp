@@ -21,7 +21,7 @@ module.exports = {
     }, function(err, faculty) {
       if (err) throw err;
       Course.find({
-        'facultyName' : faculty.name
+        'facultyId' : faculty.empid
       }, function(err, courselist) {
         if (err) throw err;
         if (courselist[0] == undefined || courselist == null) res.render('faculty/course', {
@@ -30,7 +30,6 @@ module.exports = {
           alertMessage : "No registered course found"
         })
         else {
-          console.log(courselist);
           res.render('faculty/course', {
             courses: courselist,
             faculty : req.user
@@ -40,6 +39,31 @@ module.exports = {
     });
   },
 
+  //*********************************************
+  //******** Get list of registered courses ******
+  //*********************************************
+  GetComponents: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      Course.findOne({
+        'facultyId' : faculty.empid,
+        'slot' : req.body.slot
+      }, function(err, course) {
+        if (err) throw err;
+        if (!course) res.json({
+          status : 0,
+          message : "No registered course found"
+        })
+        else {
+          res.json({
+            components : course.marksSplitUp
+          });
+        }
+      });
+    });
+  },
   //******************************************************************
   //******** Create and get access token for a course **********************
   //***************************************************************
@@ -577,8 +601,43 @@ module.exports = {
     });
   },
 
+  //*********************************************************
+  //******** Add marks split up for a course ****************
+  //*********************************************************
+
+  addSplitUp : function (req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Course.findOne({
+          'code' : req.body.code,
+          'slot' : req.body.slot,
+          'facultyId' : faculty.empid
+        }, function(err, course) {
+          if(err) throw err;
+          else {
+            var temp = {
+              component : req.body.component,
+              maxMarks : req.body.maxMarks
+            };
+            course.marksSplitUp.push(temp);
+            console.log(course);
+            course.save(function(err) {
+              if(err) throw err;
+              res.json({
+                message : 'Marks component added!'
+              });
+            });
+          }
+        });
+      }
+    });
+  },
+
   //*****************************************************
-  //******** Post marks for a student **********************
+  //******** Post marks for slot **********************
   //****************************************************
 
   postMarks: function(req, res, emp_id) {
@@ -587,15 +646,72 @@ module.exports = {
     }, function(err, faculty) {
       if (err) throw err;
       else {
-        Student.findOne({
-          'regno' : req.body.regno
-        }, function(err, student) {
+        Marks.findOne({
+          'facultyId' : faculty.empid,
+          'slot' : req.body.slot,
+          'component' : req.body.component,
+          'courseCode' : req.body.code
+        }, function(err, data) {
           if(err) throw err;
-          if(!student) failureResponse(req, res, 'Student not registered!');
+          if(!data) {
+            var marks = new Marks({
+              facultyId : faculty.empid,
+              slot : req.body.slot,
+              component : req.body.component,
+              courseCode  : req.body.code
+            });
+            marks.marks = req.body.marks;
+            console.log(marks);
+            marks.save(function(err) {
+              if(err) throw err;
+              res.json({
+                message : "Marks Updated!"
+              });
+            });
+          }
           else {
-            Marks.find()
+            data.marks = req.body.marks;
+            data.save(function(err) {
+              if(err) throw err;
+              res.json({
+                message : "Marks Updated!"
+              });
+            });
           }
         })
+      }
+    });
+  },
+
+  //*****************************************************
+  //******** Get marks for slot **********************
+  //****************************************************
+
+  getMarks: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Marks.findOne({
+          'facultyId' : faculty.empid,
+          'slot' : req.body.slot,
+          'component' : req.body.component,
+          'courseCode' : req.body.code
+        }, function(err, data) {
+          if(err) throw err;
+          if(!data) {
+            res.json({
+              status : 0
+            });
+          }
+          else {
+            res.json({
+              status : 1,
+              marks : data
+            });
+          }
+        });
       }
     });
   }
