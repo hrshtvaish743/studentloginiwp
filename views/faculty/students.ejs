@@ -1,0 +1,102 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Registered Students</h1>
+    </div>
+  </div>
+  <!-- /.container-fluid -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <table class="table table-bordered table-hover table-responsive text-center">
+          <thead>
+            <tr>
+              <th></th>
+              <th>S. No.</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Slot</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(i=0; i < faculty.courses.length; i++) { %>
+              <tr class="success">
+                <td><input id="<%= faculty.courses[i].slot %>" type="radio" name="slot" value="" onclick="getStudents(this.id)"></td>
+                <td>
+                  <%= i+1 %>
+                </td>
+                <td>
+                  <%= faculty.courses[i].code %>
+                </td>
+                <td>
+                  <%= faculty.courses[i].name %>
+                </td>
+                <td>
+                  <%= faculty.courses[i].slot %>
+                </td>
+              </tr>
+              <% } %>
+          </tbody>
+        </table>
+        <h3 id="loading" class="loading"></h3>
+        <table id="table" class="table table-bordered table-hover table-responsive text-center">
+          <thead>
+            <tr>
+              <th>S. No.</th>
+              <th>Register Number</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody id="students">
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      $('#table').hide();
+      function getStudents(slot) {
+        $('#loading').html("Loading......");
+        $('#table').hide();
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/getstudents",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "slot": slot
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+          $('#students').html("");
+          for(i=0; i < response.students.length; i++) {
+            var content = "<tr><td>" +
+            (i + 1) +"</td><td>"+
+            response.students[i].regno +
+            "</td><td>" +
+            response.students[i].name + "</td></tr>";
+            $('#students').append(content);
+            $('#loading').html("");
+            $('#table').show();
+          }
+
+          console.log(response);
+        });
+      }
+    </script>
+    </body>
+    </html>

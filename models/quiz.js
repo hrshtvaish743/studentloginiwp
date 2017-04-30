@@ -38,10 +38,6 @@ var quizSchema = new Schema({
     type: String,
     required: true
   },
-  numberOfAttempts: {
-    type: String,
-    required: true
-  },
   numberOfQuestions: {
     type: String,
     required: true

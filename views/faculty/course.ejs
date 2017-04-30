@@ -1,7 +1,7 @@
 <% include header.ejs %>
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">Time Table</h1>
+      <h1 class="page-header">Registered Courses</h1>
     </div>
   </div>
   <!-- /.container-fluid -->
@@ -15,26 +15,22 @@
               <th>Course Code</th>
               <th>Course Name</th>
               <th>Slot</th>
-              <th>Faculty</th>
             </tr>
           </thead>
           <tbody>
-            <% for(i=0; i < timetable.length; i++) { %>
+            <% for(i=0; i < courses.length; i++) { %>
               <tr class="success">
                 <td>
                   <%= i+1 %>
                 </td>
                 <td>
-                  <%= timetable[i].courseCode %>
+                  <%= courses[i].code %>
                 </td>
                 <td>
-                  <%= timetable[i].courseName %>
+                  <%= courses[i].name %>
                 </td>
                 <td>
-                  <%= timetable[i].courseSlot %>
-                </td>
-                <td>
-                  <%= timetable[i].courseFaculty %>
+                  <%= courses[i].slot %>
                 </td>
               </tr>
               <% } %>
@@ -82,7 +78,7 @@
   </div>
   <!-- /#wrapper -->
   <% include footer.ejs %>
-  <script src="/js/timetable.js" charset="utf-8"></script>
+  <script src="/js/courses.js" charset="utf-8"></script>
     <script type="text/javascript">
 
     </script>

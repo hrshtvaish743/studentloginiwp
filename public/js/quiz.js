@@ -141,6 +141,7 @@ function confirmSubmit() {
         "Marks Scored - " + response.scoredMarks + "</label>";
       $("#quiz").show();
       $('#quiz').append(results);
+      clearInterval(x);
     });
   }
 }
@@ -225,10 +226,11 @@ function incrementQuesNum() {
 
 
 var timerFlag = 0;
+var x
 function startTimer() {
   if (timerFlag == 0) {
     var countDownDate = new Date().getTime() + duration * 60 * 1000;
-    var x = setInterval(function() {
+    x = setInterval(function() {
       timerFlag = 1; 
       var now = new Date().getTime(); 
       var distance = countDownDate - now; 

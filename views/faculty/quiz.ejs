@@ -1,0 +1,142 @@
+<% include header.ejs %>
+  <div class="col-lg-12">
+    <h1 class="page-header">Quizzes</h1>
+    <% if(alertMessage.length > 0) { %>
+      <div class="alert alert-danger">
+        <%= alertMessage %>
+      </div>
+      <% } %>
+  </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <div class="well well-sm">
+              <div class="row">
+                <% if(quizzes != null) { %>
+                  <% for(i=0; i < quizzes.length; i++) { %>
+                    <form action="http://localhost:3000/faculty/editquiz" method="post" onsubmit="return(confirmAttempt());">
+                      <div class="col-sm-6 col-md-6">
+                        <h4>Course : <%= quizzes[i].courseCode %></h4>
+                        <p>
+                          <span>Name : </span>
+                          <%= quizzes[i].name %>
+                            <br>
+                            <span>Duration : </span>
+                            <%= quizzes[i].duration %> minutes
+                              <br>
+                              <span>Start Date/Time : </span>
+                              <%= quizzes[i].startDate %>
+                                <br>
+                                <span>End Date/Time : </span>
+                                <%= quizzes[i].endDate %>
+                                  <input type="text" name="quizId" value="<%= quizzes[i].quizId %>" hidden>
+                                  <br>
+                                  <button type="submit" class="btn btn-default" name="button">Edit</button>
+                                  <% if(quizzes[i].open) { %>
+                                    <button id="<%= quizzes[i].quizId %>_close" type="button" class="btn btn-default" name="button" data-action="close" data-id="<%= quizzes[i].quizId %>" onclick="toggleQuiz(this.id)">Close</button>
+                                    <% } else { %>
+                                      <button id="<%= quizzes[i].quizId %>_close" type="button" class="btn btn-default" name="button" data-action="open" data-id="<%= quizzes[i].quizId %>" onclick="toggleQuiz(this.id)">Open</button>
+                                      <% } %>
+                                        <hr style="border-top:1px solid black">
+                      </div>
+                    </form>
+                    <% }} %>
+                      <form id="quiz" class="text-center" action="#" method="post" onsubmit="return(addQuiz());">
+                        <div class="col-sm-6 col-md-12">
+                          <h2>Add a Quiz</h2>
+                          <h2 id="response"></h2>
+                          <input id="quizname" class="form-control" type="text" name="name" placeholder="Quiz Name" required><br>
+                          <select id="quizcourse" class="form-control" name="quizcourse">
+                            <option value="" selected>Courses</option>
+                            <% for(i=0; i < faculty.courses.length; i++) { %>
+                              <option value="<%= faculty.courses[i].code %>" data-slot="<%= faculty.courses[i].slot %>" onselect="selectSlot(this.slot)"><%= faculty.courses[i].name %> (<%= faculty.courses[i].type %>) - <%= faculty.courses[i].slot %></option>
+                            <% } %>
+                          </select><br>
+                          <label>Start Date :</label>
+                          <input id="quizstartdate" class="form-control" type="date" name="startDate" placeholder="Start Date" required><br>
+                          <label>End Date :</label>
+                          <input id="quizenddate" class="form-control" type="date" name="endDate" placeholder="End Date" required><br>
+                          <input id="quiznoofques" class="form-control" type="text" name="numberOfQuestions" placeholder="Number Of Questions" required><br>
+                          <input id="quizduration" class="form-control" type="text" name="duration" placeholder="Duration (In Minutes)" required>
+                          <br>
+                          <button type="submit" class="btn btn-default" name="button">Add</button>
+                        </div>
+                      </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function addQuiz() {
+        if ($('#quizcourse option:selected').data('slot') == undefined) {
+          alert('Please select course.');
+          return false;
+        } else {
+          var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://localhost:3000/faculty/addquiz",
+            "method": "POST",
+            "headers": {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            "data": {
+              "name": $('#quizname').val(),
+              "course": $('#quizcourse').val(),
+              "date": new Date(),
+              "slot": $('#quizcourse option:selected').data('slot'),
+              "startDate": $('#quizstartdate').val(),
+              "endDate": $('#quizenddate').val(),
+              "numberOfQuestions": $('#quiznoofques').val(),
+              "duration": $('#quizduration').val()
+            }
+          }
+          console.log(settings);
+          $.ajax(settings).done(function(response) {
+            alert(response.message);
+            $('#quiz').trigger("reset");
+            location.reload();
+            console.log(response);
+          });
+          return false;
+        }
+      }
+
+      function toggleQuiz(id) {
+        console.log($('#' + id).data('action'));
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/" + $('#' + id).data('action') + "quiz",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "quizId": $('#' + id).data('id')
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+          alert(response.message);
+          location.reload();
+          console.log(response);
+        });
+      }
+    </script>
+    </body>
+
+    </html>

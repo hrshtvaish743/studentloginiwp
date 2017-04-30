@@ -33,7 +33,10 @@ var studSchema = new Schema({
         courseFaculty: String,
         facultyId: String,
         courseSlot: String,
-        courseSemester: String
+        courseSemester: String,
+        type : {
+          type : String
+        }
     }]
 });
 

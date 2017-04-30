@@ -1,0 +1,143 @@
+<% include header.ejs %>
+  <div class="col-lg-12">
+    <h1 class="page-header">Edit Quiz</h1>
+  </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <div class="well well-sm">
+              <div class="row">
+                <% if(quiz != null) { %>
+                  <form action="http://localhost:3000/faculty/deletequiz" method="post" onsubmit="return(confirmDelete());">
+                    <div class="col-sm-6 col-md-6">
+                      <h4>Course : <%= quiz.courseCode %></h4>
+                      <p>
+                        <span>Name : </span>
+                        <%= quiz.name %>
+                          <br>
+                          <span>Duration : </span>
+                          <%= quiz.duration %> minutes
+                            <br>
+                            <span>Start Date/Time : </span>
+                            <%= quiz.startDate %>
+                              <br>
+                              <span>End Date/Time : </span>
+                              <%= quiz.endDate %>
+                                <input type="text" name="quizId" value="<%= quiz.quizId %>" hidden>
+                                <br>
+                                <button type="submit" class="btn btn-default" name="button">Delete Quiz</button>
+                    </div>
+                  </form>
+                  <% } %>
+                  <% if(quiz.questions.length > 0) { for(i=0; i < quiz.questions.length; i++) { %>
+                    <form action="http://localhost:3000/faculty/deletequizquestion" method="post" onsubmit="return(confirmDeleteQues());">
+                      <div class="col-sm-6 col-md-6">
+                        <input type="text" name="quizId" value="<%= quiz.quizId %>" hidden>
+                        <input type="text" name="questionId" value="<%= quiz.questions[i].questionId %>" hidden>
+                        <label> Question - <%= i+1 %></label>
+                        <input class="form-control" type="text" name="question" value="<%= quiz.questions[i].question %>" disabled>
+                        <label> Options</label>
+                        <% for(j=0; j < quiz.questions[i].options.length; j++) { %>
+                          <input class="form-control" type="text" value="<%= quiz.questions[i].options[j].option %>" disabled>
+                        <% } %>
+                        <br>
+                        <button type="submit" class="btn btn-default" name="button">Delete Question</button>
+                        <br><hr style="border-top:1px solid black">
+                      </div>
+                    </form>
+                    <% }} %>
+                      <form id="quiz" class="text-center" action="#" method="post" onsubmit="return(addQues());">
+                        <div class="col-sm-6 col-md-12">
+                          <h2>Add a Question</h2>
+                          <h4>Number of minimum Question required : <%= quiz.numberOfQuestions %></h4>
+                          <h2 id="response"></h2>
+                          <input id="quizid" type="text" name="quizId" value="<%= quiz.quizId %>" hidden>
+                          <input id="question" class="form-control" type="text" name="name" placeholder="Question" required><br>
+                          <button type="button" class=" btn btn-default" name="button" onclick="addOption();"><i class="glyphicon glyphicon-plus"></i> Add Option</button>
+                          <div id="option"></div>
+                          <br><br>
+                          <input id="answer" class="form-control" type="text" name="duration" placeholder="Answer(A, B, C, D....)" required>
+                          <br>
+                          <button type="submit" class="btn btn-default" name="button">Add</button>
+                        </div>
+                      </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function confirmDelete() {
+        var ch = confirm("Do you want to delete this quiz?");
+        if (ch) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      var optionId = 'A';
+      var optionCount = 0;
+
+      function nextChar(c) {
+        return String.fromCharCode(c.charCodeAt(0) + 1);
+      }
+
+      function addOption() {
+        content = "<br><div><span>" + optionId + "<input id=\"" + optionId +
+          "\" class=\"form-control\" type=\"text\" placeholder=\"Option\" required></span></div>";
+        $('#option').append(content);
+        optionId = nextChar(optionId);
+        optionCount += 1;
+      }
+
+      function addQues() {
+        var options = [];
+        var id = 'A';
+        for (i = 0; i < optionCount; i++) {
+          temp = {};
+          temp.option = $('#' + id).val();
+          temp.optionId = id;
+          options.push(temp);
+          id = nextChar(id);
+        }
+        console.log(options);
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/addquizquestion",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "quizId": $('#quizid').val(),
+            "question": $('#question').val(),
+            "options": options,
+            "answer": $('#answer').val()
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+          alert(response.message);
+          $('#quiz').trigger("reset");
+          location.reload();
+          console.log(response);
+        });
+        return false;
+      }
+    </script>
+    </body>
+
+    </html>

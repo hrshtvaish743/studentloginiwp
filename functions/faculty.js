@@ -11,13 +11,17 @@ var shortid = require('shortid');
 var FacFunctions = require('./faculty');
 
 module.exports = {
+
+  //*********************************************
+  //******** Get list of registered courses ******
+  //*********************************************
   GetRegisteredCourses: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
     }, function(err, faculty) {
       if (err) throw err;
       Course.find({
-        'faculty' : faculty.name
+        'facultyName' : faculty.name
       }, function(err, courselist) {
         if (err) throw err;
         if (courselist[0] == undefined || courselist == null) res.render('faculty/course', {
@@ -26,6 +30,7 @@ module.exports = {
           alertMessage : "No registered course found"
         })
         else {
+          console.log(courselist);
           res.render('faculty/course', {
             courses: courselist,
             faculty : req.user
@@ -34,6 +39,10 @@ module.exports = {
       });
     });
   },
+
+  //******************************************************************
+  //******** Create and get access token for a course **********************
+  //***************************************************************
 
   getAccessToken: function(req, res, emp_id) {
     Faculty.findOne({
@@ -65,6 +74,11 @@ module.exports = {
     });
   },
 
+
+  //*****************************************************************
+  //******** Get List of students registered in a course **********************
+  //*****************************************************************
+
   getStudentList: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
@@ -93,13 +107,16 @@ module.exports = {
           }
           res.json({
             status: 1,
-            students: response,
-            newToken: req.token
+            students: response
           });
         }
       });
     });
   },
+
+  //*************************************************************
+  //******** Get Attendance report for aparticular slot **********************
+  //***********************************************************
 
   getAttendance: function(req, res, emp_id) {
     Faculty.findOne({
@@ -111,6 +128,7 @@ module.exports = {
         Attendance.find({
           'facultyId': faculty.empid,
           'courseCode': req.body.course,
+          'slot' : req.body.slot,
           'date': req.body.date
         }, function(err, data) {
           if (err) throw err;
@@ -123,10 +141,14 @@ module.exports = {
               newToken: req.token
             });
           }
-        })
+        });
       }
     });
   },
+
+  //************************************************************
+  //******** Post attendance for a particular slot **********************
+  //************************************************************
 
   postAttendance: function(req, res, emp_id) {
     Faculty.findOne({
@@ -160,6 +182,10 @@ module.exports = {
     });
   },
 
+  //*********************************************
+  //******** Get Messages **********************
+  //*********************************************
+
   getMessages: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
@@ -177,16 +203,19 @@ module.exports = {
           if (err) throw err;
           if (!messages || messages[0] == undefined) failureResponse(req, res, 'No messages');
           else {
-              res.json({
-                status: 1,
+              res.render('faculty/messages', {
                 messages: messages,
-                newToken: req.token
+                faculty : req.user
               });
           }
         });
       }
     });
   },
+
+  //*********************************************
+  //******** Send Group Message *****************
+  //*********************************************
 
   sendGroupMessage: function(req, res, emp_id) {
     Faculty.findOne({
@@ -228,6 +257,10 @@ module.exports = {
     });
   },
 
+  //*********************************************
+  //******** Send Individual Message *****************
+  //*********************************************
+
   sendIndMessage: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
@@ -251,27 +284,41 @@ module.exports = {
     });
   },
 
-  getQuizes: function(req, res, emp_id) {
+  //************************************************
+  //******** Get quizzes open or close **********************
+  //************************************************
+
+  getquizzes: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
     }, function(err, faculty) {
       if (err) throw err;
       else {
-        Quiz.find({}, function(err, quizes) {
+        Quiz.find({
+          'facultyId' : faculty.empid
+        }, function(err, quizzes) {
           if (err) throw err;
-          if (!quizes || quizes[0] == undefined) {
-            failureResponse(req, res, 'No quiz added yet!');
+          if (!quizzes || quizzes[0] == undefined) {
+            res.render('faculty/quiz', {
+              quizzes : null,
+              faculty : req.user,
+              alertMessage : "No quiz Added yet"
+            })
           } else {
-            res.json({
-              status: 1,
-              quizes: quizes,
-              newToken: req.token
+            res.render('faculty/quiz', {
+              quizzes: quizzes,
+              faculty : req.user,
+              alertMessage : ""
             })
           }
         })
       }
     })
   },
+
+  //*********************************************
+  //******** Add a quiz for a slot **********************
+  //*********************************************
 
   addQuiz: function(req, res, emp_id) {
     Faculty.findOne({
@@ -288,21 +335,81 @@ module.exports = {
         newQuiz.date = req.body.date;
         newQuiz.startDate = req.body.startDate;
         newQuiz.endDate = req.body.endDate;
-        newQuiz.numberOfAttempts = req.body.numberOfAttempts;
         newQuiz.numberOfQuestions = req.body.numberOfQuestions;
         newQuiz.duration = req.body.duration;
         newQuiz.open = false;
+        console.log(newQuiz);
         newQuiz.save(function(err) {
           if (err) throw err;
           res.json({
             status: 1,
-            message: 'Quiz Added!',
-            newToken: req.token
+            message: 'Quiz Added!'
           });
         });
       }
     });
   },
+
+  //*************************************************
+  //******** Edit quiz **********************
+  //*************************************************
+
+  editQuiz : function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOne({
+          'quizId' : req.body.quizId
+        }, function(err, quiz) {
+          if (err) throw err;
+          if (!quiz) {
+            res.render('faculty/quiz', {
+              quizzes : null,
+              faculty : req.user,
+              alertMessage : "No quiz Added yet"
+            });
+          } else {
+            res.render('faculty/editquiz', {
+              quiz: quiz,
+              faculty : req.user
+            });
+          }
+        })
+      }
+    })
+  },
+
+  //*************************************************
+  //******** Delete quiz **********************
+  //*************************************************
+  deleteQuiz : function (req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Quiz.findOneAndRemove({
+          'quizId' : req.body.quizId
+        }, function(err, quiz) {
+          if (err) throw err;
+          if (!quiz) {
+            res.render('faculty/quiz', {
+              quizzes : null,
+              faculty : req.user,
+              alertMessage : "No quiz Added yet"
+            });
+          } else {
+            res.redirect('/faculty/quiz');
+          }
+        })
+      }
+    })
+  },
+  //*************************************************
+  //******** Add a question to a quiz **********************
+  //*************************************************
 
   addQuizQuestion: function(req, res, emp_id) {
     Faculty.findOne({
@@ -311,7 +418,7 @@ module.exports = {
       if (err) throw err;
       else {
         Quiz.findOne({
-          'quizId': req.body.quizid
+          'quizId': req.body.quizId
         }, function(err, quiz) {
           if (err) throw err;
           else {
@@ -320,7 +427,7 @@ module.exports = {
               question: req.body.question,
               options: req.body.options,
               answer: req.body.answer,
-              marks: req.body.marks
+              marks: 1
             };
             quiz.questions.push(question);
             quiz.save(function(err) {
@@ -328,8 +435,7 @@ module.exports = {
               res.json({
                 status: 1,
                 message: 'Question added to the quiz',
-                quiz: quiz,
-                newToken: req.token
+                quiz: quiz
               });
             });
           }
@@ -338,6 +444,10 @@ module.exports = {
     });
   },
 
+  //**************************************************
+  //******** Delete a quiz question **********************
+  //**************************************************
+
   deleteQuizQuestion: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
@@ -345,31 +455,35 @@ module.exports = {
       if (err) throw err;
       else {
         Quiz.findOne({
-          'quizId': req.body.quizid
+          'quizId': req.body.quizId
         }, function(err, quiz) {
           if (err) throw err;
           else {
             var questions = [];
+            console.log(req.body.questionId);
             for (i = 0; i < quiz.questions.length; i++) {
               if (quiz.questions[i].questionId != req.body.questionId) {
                 questions.push(quiz.questions[i]);
               }
             }
             quiz.questions = questions;
+            console.log(quiz.questions);
             quiz.save(function(err) {
               if (err) throw err;
-              res.json({
-                status: 1,
-                message: 'Question Deleted',
-                quiz: quiz,
-                newToken: req.token
-              })
-            })
+              res.render('faculty/editquiz', {
+                quiz : quiz,
+                faculty : req.user
+              });
+            });
           }
-        })
+        });
       }
-    })
+    });
   },
+
+  //*************************************************
+  //******** Update quiz question **********************
+  //************************************************
 
   updateQuizQuestion: function(req, res, emp_id) {
     Faculty.findOne({
@@ -406,6 +520,11 @@ module.exports = {
     })
   },
 
+
+  //*********************************************
+  //******** Open a quiz **********************
+  //*********************************************
+
   openQuiz: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
@@ -413,7 +532,7 @@ module.exports = {
       if (err) throw err;
       else {
         Quiz.findOne({
-          'quizId': req.body.quizid
+          'quizId': req.body.quizId
         }, function(err, quiz) {
           if (err) throw err;
           else {
@@ -431,6 +550,10 @@ module.exports = {
     });
   },
 
+  //*********************************************
+  //******** Close a quiz **********************
+  //*********************************************
+
   closeQuiz: function(req, res, emp_id) {
     Faculty.findOne({
       'empid': emp_id
@@ -438,16 +561,14 @@ module.exports = {
       if (err) throw err;
       else {
         Quiz.findOne({
-          'quizId': req.body.quizid
+          'quizId': req.body.quizId
         }, function(err, quiz) {
           if (err) throw err;
           else {
             quiz.open = false;
             quiz.save(function(err) {
               res.json({
-                status: 1,
-                message: 'Quiz is now closed!',
-                newToken: req.token
+                message: 'Quiz is now closed!'
               });
             });
           }
@@ -455,6 +576,10 @@ module.exports = {
       }
     });
   },
+
+  //*****************************************************
+  //******** Post marks for a student **********************
+  //****************************************************
 
   postMarks: function(req, res, emp_id) {
     Faculty.findOne({

@@ -21,7 +21,7 @@ require('../passport/passport.js')(passport);
 app.get('/', isLoggedIn, function(req, res) {
   console.log(req.user);
   res.render('faculty/index', {
-    faculty : req.user
+    faculty: req.user
   })
 });
 
@@ -33,15 +33,23 @@ app.get('/:param', isLoggedIn, function(req, res) {
     } else if (req.params.param == 'messages') {
       FacFunctions.getMessages(req, res, decoded.empid);
     } else if (req.params.param == 'quiz') {
-      FacFunctions.getQuizes(req, res, decoded.empid);
+      FacFunctions.getquizzes(req, res, decoded.empid);
     } else if (req.params.param == 'createtoken') {
       res.render('faculty/createtoken', {
-        faculty : req.user
+        faculty: req.user
       });
     } else if (req.params.param == 'newmessage') {
       res.render('faculty/newmessage', {
-        faculty : req.user
+        faculty: req.user
       });
+    } else if (req.params.param == 'getstudents') {
+      res.render('faculty/students', {
+        faculty: req.user
+      });
+    } else if (req.params.param == 'logout') {
+      req.logout();
+      req.session.destroy();
+      res.redirect("/");
     }
   } else {
     failureResponse(req, res, 'Not Authorized!');
@@ -60,6 +68,10 @@ app.post('/:param', isLoggedIn, function(req, res) {
       FacFunctions.postAttendance(req, res, decoded.empid);
     } else if (req.params.param == 'addquiz') {
       FacFunctions.addQuiz(req, res, decoded.empid);
+    } else if (req.params.param == 'editquiz') {
+      FacFunctions.editQuiz(req, res, decoded.empid);
+    } else if (req.params.param == 'deletequiz') {
+      FacFunctions.deleteQuiz(req, res, decoded.empid);
     } else if (req.params.param == 'addquizquestion') {
       FacFunctions.addQuizQuestion(req, res, decoded.empid);
     } else if (req.params.param == 'getattendance') {
@@ -80,7 +92,7 @@ app.post('/:param', isLoggedIn, function(req, res) {
       FacFunctions.postMarks(req, res, decoded.empid);
     } else if (req.params.param == 'addmarksplitup') {
       FacFunctions.marksSplitUp(req, res, decoded.empid);
-    }else {
+    } else {
       failureResponse(req, res, 'Not Found');
     }
   } else {
@@ -90,11 +102,11 @@ app.post('/:param', isLoggedIn, function(req, res) {
 
 module.exports = app;
 
-function isLoggedIn (req, res, next) {
-    if (req.isAuthenticated()) {
-      return next()
-    }
-    res.redirect('/');
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next()
+  }
+  res.redirect('/');
 }
 
 function refreshToken(req, res, next) { // Function To Refresh Token on each request

@@ -34,14 +34,17 @@ module.exports = {
           if (!faculty) failureResponse(req, res, 'Faculty or course not found or token might have expired.');
           else {
             var courseCode;
+            var courseType;
             for (i = 0; i < faculty.tokens.length; i++) {
               if (faculty.tokens[i].token == req.body.token) {
                 courseCode = faculty.tokens[i].course;
+                courseType = faculty.tokens[i].type;
                 break;
               }
             }
             Course.findOne({
-              'code': courseCode
+              'code': courseCode,
+              'type' : courseType
             }, function(err, course) {
               if (err) throw err;
               if (!course) failureResponse(req, res, 'Course not found!');
@@ -53,7 +56,8 @@ module.exports = {
                   courseFaculty: faculty.name,
                   facultyId: faculty.empid,
                   courseSlot: course.slot,
-                  courseSemester: course.semester
+                  courseSemester: course.semester,
+                  type : course.type
                 };
                 student.courses.push(enrolCourse);
                 student.save(function(err) {
@@ -224,6 +228,7 @@ module.exports = {
             newMsg.fromName = student.name;
             newMsg.to.push(faculty.empid);
             newMsg.message = req.body.message;
+            newMsg.date = req.body.date;
             newMsg.save(function(err) {
               if (err) throw err;
               res.json({
@@ -343,7 +348,8 @@ module.exports = {
                       questionIds: tempQuiz.questions,
                       duration : quiz.duration
                     },
-                    student: req.user
+                    student: req.user,
+                    alertMessage : ""
                   });
                 });
               } else {

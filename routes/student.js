@@ -76,6 +76,10 @@ app.get('/:param', isLoggedIn, function(req, res) {
       res.render('student/attendance', {
         student : req.user
       });
+    } else if (req.params.param == 'logout') {
+      req.logout();
+      req.session.destroy();
+      res.redirect("/");
     }
   } else {
     failureResponse(req, res, 'Not authorized!');

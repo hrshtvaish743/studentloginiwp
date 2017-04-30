@@ -1,7 +1,7 @@
 <% include header.ejs %>
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">Send Message to Faculty</h1>
+      <h1 class="page-header">Send Message to Students</h1>
     </div>
   </div>
   <!-- /.row -->
@@ -34,7 +34,7 @@
                   <hr style="border:1px solid black;">
                   <label>Individual Message : </label>
                   <div id="ind-response" class="btn-success"></div>
-                  <form id="ind-newmessage" class="text-center" onsubmit="return(sendMessage());">
+                  <form id="ind-newmessage" class="text-center" onsubmit="return(sendIndMessage());">
                     <label>Register Number : </label>
                     <input id="ind-to" class="form-control" type="text" name="to" value="" placeholder="Register Number">
                     <label>Message : </label>
@@ -62,14 +62,15 @@
         var settings = {
           "async": true,
           "crossDomain": true,
-          "url": "http://localhost:3000/student/sendmessage",
+          "url": "http://localhost:3000/faculty/sendmessage-group",
           "method": "POST",
           "headers": {
             "content-type": "application/x-www-form-urlencoded"
           },
           "data": {
-            "to": $('#to').val(),
-            "message": $('#message').val()
+            "slot": $('#to').val(),
+            "message": $('#message').val(),
+            "date" : new Date()
           }
         }
         console.log(settings);
@@ -78,7 +79,29 @@
           $('#newmessage').trigger("reset");
           console.log(response);
         });
-
+        return false;
+      }
+      function sendIndMessage() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/sendmessage-ind",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "to": $('#ind-to').val(),
+            "message": $('#ind-message').val(),
+            "date" : new Date()
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+        alert(response.message);
+        $('#ind-newmessage').trigger("reset");
+          console.log(response);
+        });
         return false;
       }
     </script>

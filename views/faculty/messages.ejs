@@ -24,7 +24,7 @@
                           <br>
                           <div class="<%= i %>">
                             <input id="<%= i %>" type="text" name="message" placeholder="Reply" value="">
-                            <button type="button" class="btn btn-default" name="button" onclick="sendReply(<%= messages[i].from %>, <%= i %>);">Send</button>
+                            <button type="button" class="btn btn-default" name="button" onclick="sendReply('<%= messages[i].from %>', <%= i %>);">Send</button>
                           </div>
                           <hr style="border-top:1px solid black">
                   </div>
@@ -48,7 +48,7 @@
         var settings = {
           "async": true,
           "crossDomain": true,
-          "url": "http://localhost:3000/student/sendmessage",
+          "url": "http://localhost:3000/faculty/sendmessage-ind",
           "method": "POST",
           "headers": {
             "content-type": "application/x-www-form-urlencoded"
@@ -59,7 +59,7 @@
             "date" : new Date()
           }
         }
-
+        console.log(settings);
         $.ajax(settings).done(function(response) {
           $('#' + messageId).parent().html(response.message);
           console.log(response);
