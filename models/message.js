@@ -7,6 +7,10 @@ var messageSchema = new Schema({
         type: String,
         required: true
     },
+    fromName: {
+        type: String,
+        required: true
+    },
     to: {
         type: [String],
         required: true

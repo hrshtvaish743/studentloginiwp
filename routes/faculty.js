@@ -18,19 +18,30 @@ var passport = require('passport');
 require('../passport/passport.js')(passport);
 
 // INDEX ===========================
-app.post('/', authenticate, function(req, res) {
-  res.sendFile(path.resolve('public/faculty.html'));
+app.get('/', isLoggedIn, function(req, res) {
+  console.log(req.user);
+  res.render('faculty/index', {
+    faculty : req.user
+  })
 });
 
-app.get('/:param', authenticate, refreshToken, function(req, res) {
-  var decoded = jwt_decode(req.headers.authorization);
+app.get('/:param', isLoggedIn, function(req, res) {
+  var decoded = req.user;
   if (decoded.role == 'faculty') {
-    if (req.params.param == 'getcourses') {
-      FacFunctions.GetRegisteredCourses(req, res, decoded.emp_id);
+    if (req.params.param == 'courses') {
+      FacFunctions.GetRegisteredCourses(req, res, decoded.empid);
     } else if (req.params.param == 'messages') {
-      FacFunctions.getMessages(req, res, decoded.emp_id);
+      FacFunctions.getMessages(req, res, decoded.empid);
     } else if (req.params.param == 'quiz') {
-      FacFunctions.getQuizes(req, res, decoded.emp_id);
+      FacFunctions.getQuizes(req, res, decoded.empid);
+    } else if (req.params.param == 'createtoken') {
+      res.render('faculty/createtoken', {
+        faculty : req.user
+      });
+    } else if (req.params.param == 'newmessage') {
+      res.render('faculty/newmessage', {
+        faculty : req.user
+      });
     }
   } else {
     failureResponse(req, res, 'Not Authorized!');
@@ -38,36 +49,38 @@ app.get('/:param', authenticate, refreshToken, function(req, res) {
 });
 
 
-app.post('/:param', authenticate, refreshToken, function(req, res) {
-  var decoded = jwt_decode(req.headers.authorization);
+app.post('/:param', isLoggedIn, function(req, res) {
+  var decoded = req.user;
   if (decoded.role == 'faculty') {
     if (req.params.param == 'getaccesstoken') {
-      FacFunctions.getAccessToken(req, res, decoded.emp_id);
+      FacFunctions.getAccessToken(req, res, decoded.empid);
     } else if (req.params.param == 'getstudents') {
-      FacFunctions.getStudentList(req, res, decoded.emp_id);
+      FacFunctions.getStudentList(req, res, decoded.empid);
     } else if (req.params.param == 'attendance') {
-      FacFunctions.postAttendance(req, res, decoded.emp_id);
+      FacFunctions.postAttendance(req, res, decoded.empid);
     } else if (req.params.param == 'addquiz') {
-      FacFunctions.addQuiz(req, res, decoded.emp_id);
+      FacFunctions.addQuiz(req, res, decoded.empid);
     } else if (req.params.param == 'addquizquestion') {
-      FacFunctions.addQuizQuestion(req, res, decoded.emp_id);
+      FacFunctions.addQuizQuestion(req, res, decoded.empid);
     } else if (req.params.param == 'getattendance') {
-      FacFunctions.getAttendance(req, res, decoded.emp_id);
+      FacFunctions.getAttendance(req, res, decoded.empid);
     } else if (req.params.param == 'sendmessage-group') {
-      FacFunctions.sendGroupMessage(req, res, decoded.emp_id);
+      FacFunctions.sendGroupMessage(req, res, decoded.empid);
     } else if (req.params.param == 'sendmessage-ind') {
-      FacFunctions.sendIndMessage(req, res, decoded.emp_id);
+      FacFunctions.sendIndMessage(req, res, decoded.empid);
     } else if (req.params.param == 'deletequizquestion') {
-      FacFunctions.deleteQuizQuestion(req, res, decoded.emp_id);
+      FacFunctions.deleteQuizQuestion(req, res, decoded.empid);
     } else if (req.params.param == 'updatequizquestion') {
-      FacFunctions.updateQuizQuestion(req, res, decoded.emp_id);
+      FacFunctions.updateQuizQuestion(req, res, decoded.empid);
     } else if (req.params.param == 'openquiz') {
-      FacFunctions.openQuiz(req, res, decoded.emp_id);
+      FacFunctions.openQuiz(req, res, decoded.empid);
     } else if (req.params.param == 'closequiz') {
-      FacFunctions.closeQuiz(req, res, decoded.emp_id);
+      FacFunctions.closeQuiz(req, res, decoded.empid);
     } else if (req.params.param == 'postmarks') {
-      FacFunctions.postMarks(req, res, decoded.emp_id);
-    } else {
+      FacFunctions.postMarks(req, res, decoded.empid);
+    } else if (req.params.param == 'addmarksplitup') {
+      FacFunctions.marksSplitUp(req, res, decoded.empid);
+    }else {
       failureResponse(req, res, 'Not Found');
     }
   } else {
@@ -77,12 +90,19 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
 
 module.exports = app;
 
+function isLoggedIn (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next()
+    }
+    res.redirect('/');
+}
+
 function refreshToken(req, res, next) { // Function To Refresh Token on each request
   var decoded = jwt_decode(req.headers.authorization);
   req.token = jwt.sign({
     id: decoded.id,
     role: decoded.role,
-    emp_id: decoded.emp_id
+    empid: decoded.empid
   }, config.Secret, {
     expiresIn: 120 * 60
   });

@@ -11,15 +11,14 @@ var courseSchema = new Schema({
         type: String,
         required: true
     },
-    semester: {
+    facultyName: {
         type: String,
         required: true
     },
-    faculties: {
-        type: [String],
-        required: true
+    facultyId : {
+      type : String
     },
-    slots: {
+    slot: {
         type: String,
         required: true
     },
@@ -28,6 +27,7 @@ var courseSchema = new Schema({
         type: String,
         required: true
     },
+    venue : String
 });
 
 var course = mongoose.model('Courses', courseSchema);

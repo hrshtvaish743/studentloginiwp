@@ -1,0 +1,53 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="text-center text-muted">ATTENDANCE</h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="progress">
+            <div class="progress-bar progress-success">
+            </div>
+          </div> <span class="label label-default"> Current Subject </span>
+        </div>
+      </div><br>
+      <div class="btn-group dropup">
+        <button class="btn btn-default">Subjects</button>
+        <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+					<span class="caret"></span>
+				</button>
+        <ul class="dropdown-menu">
+          <% for (i=0; i<student.courses.length; i++) { %>
+            <li>
+              <a href="#">
+                <%= student.courses[i].courseCode %>
+              </a>
+            </li>
+            <% } %>
+        </ul>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <!-- /#page-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script src="student.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      var student = {
+        name: "<%= student.name %>",
+        regno: "<%= student.regno %>",
+        phone: "<%= student.phone %>",
+        email: "<%= student.email %>"
+      }
+
+      function displayProfile() {
+
+      }
+      console.log(student);
+    </script>
+    </body>
+
+    </html>

@@ -3,15 +3,21 @@ var LocalStrategy = require('passport-local').Strategy;
 // load up the user model
 var Student = require('../models/student');
 var Faculty = require('../models/faculty');
+var User;
 
 module.exports = function(passport) {
 
     passport.serializeUser(function(user, done) {
+      if(user.role == 'student') {
+        User = Student;
+      } else {
+        User = Faculty;
+      }
         done(null, user.id);
     });
     passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
-            done(err, user);
+      User.findById(id, function(err, user) {
+          done(null, user);
         });
     });
 
@@ -24,7 +30,6 @@ module.exports = function(passport) {
         function(req, regno, password, done) {
             if (regno)
                 regno = regno.toUpperCase();
-
             process.nextTick(function() {
                 Student.findOne({
                     'regno': regno

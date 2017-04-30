@@ -1,0 +1,70 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Messages</h1>
+    </div>
+  </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <div class="well well-sm">
+              <div class="row">
+                <% for(i=0; i < messages.length; i++) { %>
+                  <div class="col-sm-6 col-md-6">
+                    <h4>From : <%= messages[i].fromName %></h4>
+                    <p>
+                      <span>Date : </span>
+                      <%= messages[i].date %>
+                        <br>
+                        <span>Message : </span>
+                        <%= messages[i].message %>
+                          <br>
+                          <div class="<%= i %>">
+                            <input id="<%= i %>" type="text" name="message" placeholder="Reply" value="">
+                            <button type="button" class="btn btn-default" name="button" onclick="sendReply(<%= messages[i].from %>, <%= i %>);">Send</button>
+                          </div>
+                          <hr style="border-top:1px solid black">
+                  </div>
+                  <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function sendReply(to, messageId) {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/student/sendmessage",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "to": to,
+            "message": $('#' + messageId).val()
+          }
+        }
+
+        $.ajax(settings).done(function(response) {
+          $('#' + messageId).parent().html(response.message);
+          console.log(response);
+        });
+      }
+    </script>
+    </body>
+
+    </html>

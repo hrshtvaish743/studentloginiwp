@@ -1,0 +1,67 @@
+<!Doctype html>
+<html>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+<link rel="stylesheet" href="./stylesheets/login.css" type="text/css">
+</head>
+<body>
+<div class="container">
+   <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <div class="panel panel-login">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-lg-12">
+              <form id="student-login-form" action="login/student" method="post" role="form" style="display: block;">
+                <h2>Student Login</h2>
+                  <div class="form-group">
+                    <input type="text" name="regno" id="username" tabindex="1" class="form-control" placeholder="Register Number" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                  </div>
+                  <div class="col-xs-6 form-group pull-right">
+                        <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                  </div>
+              </form>
+              <form id="faculty-login-form" action="login/faculty" method="post" role="form" style="display: none;">
+                <h2>Faculty Login</h2>
+                  <div class="form-group">
+                    <input type="text" name="empid" id="username" tabindex="1" class="form-control" placeholder="Employee ID" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                  </div>
+                  <div class="col-xs-6 form-group pull-right">
+                        <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-6 tabs">
+              <a href="#" class="active-btn" id="student-login-form-link"><div id="student-login-form-link-div" class="login active-btn">STUDENT</div></a>
+            </div>
+            <div class="col-xs-6 tabs">
+              <a href="#" id="faculty-login-form-link"><div id="faculty-login-form-link-div" class="login">FACULTY</div></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>
+</footer>
+
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="./js/login.js" charset="utf-8"></script>
+
+</html>

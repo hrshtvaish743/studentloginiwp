@@ -1,0 +1,60 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Join Course</h1>
+    </div>
+  </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <h3>Use token provided by faculty to join course</h3>
+            <div class="well well-sm">
+              <div class="row">
+                <div class="col-sm-6 col-md-10">
+                  <form class="text-center" method="post">
+                    <input id="accesstoken" class="form-control" type="text" name="token" placeholder="Access Token" value="">
+                    <br>
+                    <button type="button" class="btn btn-default" name="button" onclick="joinCourse();">Join</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function joinCourse() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/student/joincourse",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "token": $('#accesstoken').val()
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+          $('#accesstoken').parent().html(response.message);
+          console.log(response);
+        });
+      }
+    </script>
+    </body>
+
+    </html>

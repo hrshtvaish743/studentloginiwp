@@ -82,10 +82,9 @@ module.exports = {
       if (err) throw err;
       if (!student) failureResponse(req, res, 'Student not registered!');
       else {
-        res.json({
-          status : 1,
-          timetable : student.courses,
-          newToken : req.token
+        res.render('student/timetable', {
+          timetable: student.courses,
+          student: req.user
         });
       }
     });
@@ -107,17 +106,14 @@ module.exports = {
         }, function(err, marksData) {
           if (err) throw err;
           if (!marksData) {
-            res.json({
-              status : 1,
-              marks : null,
-              newToken : req.token
+            res.render('students/marks', {
+              marks: null,
+              student : req.user
             });
-          }
-          else {
-            res.json({
-              status : 1,
-              marks : marksData,
-              newToken : req.token
+          } else {
+            res.render('student/marks', {
+              marks: marksData,
+              student : req.user
             });
           }
         });
@@ -144,12 +140,15 @@ module.exports = {
           }
         }, function(err, messages) {
           if (err) throw err;
-          if (!messages) failureResponse(req, res, 'No messages!');
+          if (!messages || messages[0] == undefined) res.render('student/messages', {
+            messages : null,
+            student : req.user,
+            alertMessage : "No messages"
+          });
           else {
-            res.json({
-              status : 1,
-              messages : messages,
-              newToken : req.token
+            res.render('student/messages', {
+              messages: messages,
+              student: req.user
             });
           }
         });
@@ -215,21 +214,21 @@ module.exports = {
       if (!student) failureResponse(req, res, 'Student not registered!');
       else {
         Faculty.findOne({
-          'empid': req.body.empid
+          'empid': req.body.to
         }, function(err, faculty) {
           if (err) throw err;
           if (!faculty) failureResponse(req, res, 'Faculty or course not found or token might have expired.');
           else {
             var newMsg = new Message();
             newMsg.from = student.regno;
+            newMsg.fromName = student.name;
             newMsg.to.push(faculty.empid);
             newMsg.message = req.body.message;
             newMsg.save(function(err) {
               if (err) throw err;
               res.json({
-                status : 1,
-                message : "Message Sent!",
-                newToken : req.token
+                status: 1,
+                message: "Message Sent!"
               });
             })
           }
@@ -260,7 +259,11 @@ module.exports = {
           'open': true
         }, function(err, quizes) {
           if (err) throw err;
-          if (!quizes || quizes[0] == undefined) failureResponse(req, res, 'No quizes found!');
+          if (!quizes || quizes[0] == undefined) res.render('student/quiz', {
+            quizes : null,
+            student : req.user,
+            alertMessage : "No Quizes Found"
+          })
           else {
             var quizList = [];
             for (i = 0; i < quizes.length; i++) {
@@ -274,10 +277,10 @@ module.exports = {
               };
               quizList.push(temp);
             }
-            res.json({
-              status: 1,
+            res.render('student/quiz', {
               quizes: quizList,
-              newToken: req.token
+              student: req.user,
+              alertMessage : ""
             });
           }
         });
@@ -301,7 +304,11 @@ module.exports = {
           'open': true
         }, function(err, quiz) {
           if (err) throw err;
-          if (!quiz) failureResponse(req, res, 'No quiz found!');
+          if (!quiz) res.render('student/quiz', {
+            quizes: null,
+            student: req.user,
+            alertMessage : "No Quiz Found"
+          });
           else {
             QuizTemp.findOne({
               'quizId': req.body.quizId,
@@ -314,7 +321,7 @@ module.exports = {
                   regno: student.regno,
                   date: 'Date',
                   startTime: 'starttime',
-                  submitted : false
+                  submitted: false
                 });
                 var numberOfQuestions = quiz.numberOfQuestions;
                 var randomQuestions = getRandom(quiz.questions, numberOfQuestions);
@@ -326,19 +333,26 @@ module.exports = {
                   tempQuiz.questions.push(tempQuestions);
                 }
                 tempQuiz.save(function(err) {
-                  res.json({
+                  res.render('student/attemptquiz', {
                     status: 1,
                     quiz: {
+                      quizId: quiz.quizId,
                       name: quiz.name,
                       slot: quiz.slot,
                       numberOfQuestions: quiz.numberOfQuestions,
-                      firstQuestion: tempQuiz.questions[0]
+                      questionIds: tempQuiz.questions,
+                      duration : quiz.duration
                     },
-                    newToken: req.token
+                    student: req.user
                   });
                 });
               } else {
-                failureResponse(req, res, 'Quiz already attempted!');
+                res.render('student/attemptquiz', {
+                  status: 1,
+                  quiz: null,
+                  student: req.user,
+                  alertMessage : "Quiz already Attempted"
+                });
               }
             });
           }
@@ -399,7 +413,7 @@ module.exports = {
           'submitted': false
         }, function(err, temp) {
           if (err) throw err;
-          if(!temp) failureResponse(req, res, 'Quiz already attempted or attempt not started yet!');
+          if (!temp) failureResponse(req, res, 'Quiz already attempted or attempt not started yet!');
           else {
             var nextId, marks;
             if (req.body.attemptId) {
@@ -488,10 +502,10 @@ module.exports = {
         QuizTemp.findOne({
           'quizId': req.body.quizId,
           'regno': regno,
-          'submitted' : false
+          'submitted': false
         }, function(err, temp) {
           if (err) throw err;
-          if(!temp) failureResponse(req, res, 'Quiz already submitted or attempt not started!')
+          if (!temp) failureResponse(req, res, 'Quiz already submitted or attempt not started!')
           else {
             var marks;
             if (req.body.attemptId) {
@@ -509,68 +523,21 @@ module.exports = {
             }, function(err, submit) {
               if (err) throw err;
               if (!submit) {
-                var newSubmit = new QuizSubmission({
-                  quizId: req.body.quizId,
-                  regno: regno,
-                  date: 'date',
-                  startTime: 'startTime',
-                });
-                if (req.body.attemptId) {
-                  var solution = {
-                    questionId: req.body.attemptId,
-                    answer: req.body.answer,
-                    marks: marks
-                  };
-                  newSubmit.solutions.push(solution);
+                var numOfAttempted = 0;
+                var TotalQues = temp.questions.length;
+                var maxMarks = 0;
+                for (var i = 0; i < temp.questions.length; i++) {
+                  maxMarks += temp.questions[i].marks;
                 }
-                Quiz.findOne({
-                  'quizId': req.body.quizId
-                }, function(err, MainQuiz) {
-                  if (err) throw err;
-                  else {
-                    var AcqMarks = 0;
-                    for (i = 0; i < submit.solutions.length; i++) {
-                      index = search(MainQuiz.questions, submit.solutions[i].questionId);
-                      if (index >= 0) {
-                        if (submit.solutions[i].answer == MainQuiz.questions[index].answer) {
-                          AcqMarks = AcqMarks + MainQuiz.questions[index].marks;
-                        }
-                      }
-                    }
-                  }
-                  var numOfAttempted = newSubmit.solutions.length;
-                  var TotalQues = temp.questions.length;
-                  var maxMarks = 0;
-                  for (var i = 0; i < temp.questions.length; i++) {
-                    maxMarks += temp.questions[i].marks;
-                  }
-                  newSubmit.submitted = true;
-                  newSubmit.save(function(err) {
-                    if (err) throw err;
-                    res.json({
-                      status: 1,
-                      message: 'Quiz submitted',
-                      TotalQues: TotalQues,
-                      QuestionsAttempted: numOfAttempted,
-                      scoredMarks: AcqMarks,
-                      maxMarks: maxMarks
-                    });
-                  });
+                res.json({
+                  status: 1,
+                  message: 'Quiz submitted',
+                  TotalQues: TotalQues,
+                  QuestionsAttempted: numOfAttempted,
+                  scoredMarks: 0,
+                  maxMarks: maxMarks
                 });
               } else {
-                if (req.body.attemptId) {
-                  var index = search(submit.solutions, req.body.attemptId);
-                  if (index >= 0) {
-                    submit.solutions[index].answer = req.body.answer;
-                  } else {
-                    var solution = {
-                      questionId: req.body.attemptId,
-                      answer: req.body.answer,
-                      marks: marks
-                    };
-                    submit.solutions.push(solution);
-                  }
-                }
                 Quiz.findOne({
                   'quizId': req.body.quizId
                 }, function(err, MainQuiz) {

@@ -39,6 +39,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
+app.set('view engine', 'ejs');
 
 var index = require('./routes/index.js');
 var student = require('./routes/student.js');

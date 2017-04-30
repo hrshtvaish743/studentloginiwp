@@ -41,6 +41,10 @@ body{
   }
 }
 
+.active-btn {
+  border-bottom: 10px solid black;
+}
+
 
 .panel {
   border-radius: 5px;

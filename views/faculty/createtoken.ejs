@@ -1,0 +1,73 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Create Access Token</h1>
+    </div>
+  </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <h3>Create access token for courses.</h3>
+            <div class="well well-sm">
+              <div class="row">
+                <div id="response" class="col-sm-6 col-md-10">
+                  <h3>Available tokens : </h3>
+                  <ul>
+                    <% for(j=0; j < faculty.tokens.length; j++) { %>
+                      <li><%= faculty.tokens[j].course %> - (<%= faculty.tokens[j].type %>) : <span class="btn-success"><%= faculty.tokens[j].token %></span></li>
+                      <% } %>
+                  </ul>
+                      <label>Select Course</label>
+                      <form class="text-center" method="post">
+                        <select id="coursecode" class="form-control" name="course" required>
+                      <option value="" selected></option>
+                      <% for(i=0; i < faculty.courses.length; i++) { %>
+                      <option value="<%= faculty.courses[i].code %>" onclick="selectType('<%= faculty.courses[i].type %>')"><%= faculty.courses[i].code %> - <%= faculty.courses[i].name %> - <%= faculty.courses[i].type %></option>
+                      <% } %>
+                    </select>
+                        <br>
+                        <button type="button" class="btn btn-default" name="button" onclick="getAccessToken();">Create</button>
+                      </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      var Ctype;
+      function selectType(type) {
+        Ctype = type;
+      }
+      function getAccessToken() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/faculty/getaccesstoken",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "code": $('#coursecode').val(),
+            "type": Ctype
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+          $('#response').html("Course : " + response.accessToken.course + "<br>Access Token : <span style=\"color:red\">" + response.accessToken.token + "</span><br>Please copy the code.");
+          console.log(response);
+        });
+      }
+    </script>
+    </body>
+    </html>

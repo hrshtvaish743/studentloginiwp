@@ -1,0 +1,91 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Time Table</h1>
+    </div>
+  </div>
+  <!-- /.container-fluid -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <table class="table table-bordered table-hover table-responsive text-center">
+          <thead>
+            <tr>
+              <th>S. No.</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Slot</th>
+              <th>Faculty</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(i=0; i < timetable.length; i++) { %>
+              <tr class="success">
+                <td>
+                  <%= i+1 %>
+                </td>
+                <td>
+                  <%= timetable[i].courseCode %>
+                </td>
+                <td>
+                  <%= timetable[i].courseName %>
+                </td>
+                <td>
+                  <%= timetable[i].courseSlot %>
+                </td>
+                <td>
+                  <%= timetable[i].courseFaculty %>
+                </td>
+              </tr>
+              <% } %>
+          </tbody>
+        </table>
+        <table class="table table-bordered table-hover table-responsive text-center">
+          <thead>
+            <tr>
+              <th>Day/Time</th>
+              <th>8:00 - 8:50</th>
+              <th>9:00 - 9:50</th>
+              <th>10:00 - 10:50</th>
+              <th>11:00 - 11:50</th>
+              <th>12:00 - 1:00</th>
+              <th>Lunch</th>
+              <th>2:00 - 2:50</th>
+              <th>3:00 - 3:50</th>
+              <th>4:00 - 4:50</th>
+              <th>5:00 - 5:50</th>
+              <th>6:00 - 6:50</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% n = 1 %>
+              <% for(i=0; i<5; i++) { %>
+                <tr class="success">
+                  <%  for(j=0; j<12; j++) { %>
+                    <% if(j == 6) { %>
+                      <td>-</td>
+                      <% } else if (j == 0) { %>
+                        <td>Day - <%= i %></td>
+                      <% } else { %>
+                        <td>L<%= n++ %>
+                        </td>
+                        <% }} %>
+                </tr>
+                <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+  <script src="/js/timetable.js" charset="utf-8"></script>
+    <script type="text/javascript">
+
+    </script>
+    </body>
+
+    </html>

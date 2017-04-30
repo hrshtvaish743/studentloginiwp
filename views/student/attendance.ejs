@@ -1,0 +1,50 @@
+<% include header.ejs %>
+      <!-- /.row -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-12 col-sm-6 col-md-10">
+                <div class="well well-sm">
+                  <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function sendReply(to, messageId) {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/student/sendmessage",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "to": to,
+            "message": $('#' + messageId).val()
+          }
+        }
+
+        $.ajax(settings).done(function(response) {
+          $('#' + messageId).parent().html(response.message);
+          console.log(response);
+        });
+      }
+    </script>
+    </body>
+
+    </html>

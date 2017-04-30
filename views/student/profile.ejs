@@ -1,0 +1,59 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="page-header">Profile</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6">
+            <div class="well well-sm">
+              <div class="row">
+                <div class="col-sm-6 col-md-4">
+                  <img src="http://placehold.it/380x500" alt="" class="img-rounded img-responsive" />
+                </div>
+                <div class="col-sm-6 col-md-8">
+                  <h4><%= student.name %></h4>
+                  <p>
+                    <i class="glyphicon glyphicon-user"></i>
+                    <%= student.regno %>
+                      <br>
+                      <i class="glyphicon glyphicon-envelope"></i>
+                      <%= student.email %>
+                        <br />
+                        <i class="glyphicon glyphicon-phone"></i>
+                        <%= student.phone %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <!-- /#page-wrapper -->
+
+  </div>
+  <% include footer.ejs %>
+    <script src="student.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      var student = {
+        name: "<%= student.name %>",
+        regno: "<%= student.regno %>",
+        phone: "<%= student.phone %>",
+        email: "<%= student.email %>"
+      }
+
+      function displayProfile() {
+
+      }
+      console.log(student);
+    </script>
+    </body>
+
+    </html>

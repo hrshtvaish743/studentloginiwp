@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt-nodejs');
 
 var Schema = mongoose.Schema;
 var marksSchema = new Schema({
-    regno: {
+    facultyId: {
         type: String,
         required: true
     },
@@ -11,12 +11,23 @@ var marksSchema = new Schema({
         type: String,
         required: true
     },
-    marks: {
-        type: String
-    },
-    exam : {
-      type : String
-    }
+    marksSplitUp : [
+      {
+        component : {
+          type : String
+        },
+        maxMarks : {
+          type : Number
+        }
+      }
+    ],
+    marks : [
+      {
+        regno : String,
+        component : String
+
+      }
+    ]
 });
 
 var marks = mongoose.model('Marks', marksSchema);

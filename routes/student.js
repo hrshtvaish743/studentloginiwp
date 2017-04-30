@@ -15,12 +15,21 @@ var app = express.Router();
 var passport = require('passport');
 require('../passport/passport.js')(passport);
 
-app.get('/', authenticate, function(req, res) {
-  res.sendFile(path.resolve('public/student.html'));
+app.get('/',isLoggedIn, function(req, res) {
+  res.render('student/index', {
+    student : req.user
+  });
 });
 
-app.post('/:param', authenticate, refreshToken, function(req, res) {
-  var decoded = jwt_decode(req.headers.authorization);
+app.get('/profile', isLoggedIn,  function(req, res) {
+  console.log(req.user);
+  res.render('student/profile', {
+    student : req.user
+  });
+});
+
+app.post('/:param', isLoggedIn, function(req, res) {
+  var decoded = req.user;
   if (decoded.role == 'student') {
     if (req.params.param == 'joincourse') {
       StudFunctions.joinCourse(req, res, decoded.regno);
@@ -28,8 +37,6 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
       StudFunctions.getAttendance(req, res, decoded.regno);
     } else if (req.params.param == 'sendmessage') {
       StudFunctions.sendMessage(req, res, decoded.regno);
-    } else if (req.params.param == 'postdiscussion') {
-      StudFunctions.postDiscussion(req, res, decoded.regno);
     } else if (req.params.param == 'attemptquiz') {
       StudFunctions.attemptQuiz(req, res, decoded.regno);
     } else if (req.params.param == 'nextques') {
@@ -38,23 +45,37 @@ app.post('/:param', authenticate, refreshToken, function(req, res) {
       StudFunctions.submitQuiz(req, res, decoded.regno);
     } else if (req.params.param == 'getquizquestion') {
       StudFunctions.getQuestion(req, res, decoded.regno);
+    } else {
+      failureResponse(req, res, 'Not Found');
     }
   } else {
     failureResponse(req, res, 'Not authorized!');
   }
 });
 
-app.get('/:param', authenticate, refreshToken, function(req, res) {
-  var decoded = jwt_decode(req.headers.authorization);
+app.get('/:param', isLoggedIn, function(req, res) {
+  var decoded = req.user;
   if (decoded.role == 'student') {
     if (req.params.param == 'timetable') {
-      StudFunctions.getTimetable(req, res, regno);
+      StudFunctions.getTimetable(req, res, decoded.regno);
     } else if (req.params.param == 'marks') {
       StudFunctions.getMarks(req, res, decoded.regno);
     } else if (req.params.param == 'messages') {
       StudFunctions.getMessages(req, res, decoded.regno);
     } else if (req.params.param == 'quiz') {
       StudFunctions.getQuiz(req, res, decoded.regno);
+    } else if (req.params.param == 'joincourse') {
+      res.render('student/joincourse', {
+        student : req.user
+      });
+    } else if (req.params.param == 'newmessage') {
+      res.render('student/newmessage', {
+        student : req.user
+      });
+    } else if (req.params.param == 'attendance') {
+      res.render('student/attendance', {
+        student : req.user
+      });
     }
   } else {
     failureResponse(req, res, 'Not authorized!');
@@ -63,18 +84,12 @@ app.get('/:param', authenticate, refreshToken, function(req, res) {
 
 module.exports = app;
 
-function refreshToken(req, res, next) { // Function To Refresh Token on each request
-  var decoded = jwt_decode(req.headers.authorization);
-  req.token = jwt.sign({
-    id: decoded.id,
-    role: decoded.role,
-    regno: decoded.regno
-  }, config.Secret, {
-    expiresIn: 120 * 60
-  });
-  next();
+function isLoggedIn (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next()
+    }
+    res.redirect('/');
 }
-
 
 
 function failureResponse(req, res, message) {

@@ -29,8 +29,35 @@ var facultySchema = new Schema({
     },
     tokens: [{
         course: String,
-        token: String
-    }]
+        token: String,
+        type : {
+          type : String
+        }
+    }],
+    courses : [
+      {
+        name : String,
+        code : String,
+        slot : String,
+        venue : String,
+        type : {
+          type : String
+        },
+        marksSplitUp : [
+          {
+            component : {
+              type : String
+            },
+            maxMarks : {
+              type : Number
+            },
+            scoredMarks : {
+              type : Number
+            }
+          }
+        ]
+      }
+    ]
 });
 
 facultySchema.methods.generateHash = function(password) {

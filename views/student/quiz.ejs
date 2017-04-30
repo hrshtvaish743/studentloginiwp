@@ -1,0 +1,64 @@
+<% include header.ejs %>
+    <div class="col-lg-12">
+      <h1 class="page-header">Quizes</h1>
+      <h4>Here are all the available quizes.</h4>
+      <% if(alertMessage.length > 0) { %>
+        <div class="alert alert-danger">
+          <%= alertMessage %>
+        </div>
+        <% } %>
+    </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <div class="well well-sm">
+              <div class="row">
+                <% for(i=0; i < quizes.length; i++) { %>
+                  <form action="http://localhost:3000/student/attemptquiz" method="post" onsubmit="return(confirmAttempt());">
+                    <div class="col-sm-6 col-md-6">
+                      <h4>Course : <%= quizes[i].course %></h4>
+                      <p>
+                        <span>Name : </span>
+                        <%= quizes[i].name %>
+                          <br>
+                          <span>Duration : </span>
+                          <%= quizes[i].duration %> minutes
+                            <br>
+                            <span>Start Date/Time : </span>
+                            <%= quizes[i].startDate %>
+                              <br>
+                              <span>End Date/Time : </span>
+                              <%= quizes[i].endDate %>
+                                <input type="text" name="quizId" value="<%= quizes[i].quizId %>" hidden>
+                                <br>
+                                <button type="submit" class="btn btn-default" name="button">Attempt</button>
+                                <hr style="border-top:1px solid black">
+                    </div>
+                  </form>
+                  <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function confirmAttempt() {
+        var ch = confirm("Do you want to start the attempt? There may not be any more attempts for the quiz.");
+        return ch;
+      }
+    </script>
+    </body>
+
+    </html>

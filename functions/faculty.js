@@ -4,6 +4,7 @@ var Course = require('../models/course');
 var Attendance = require('../models/attendance');
 var Message = require('../models/message');
 var Quiz = require('../models/quiz');
+var Marks = require('../models/marks');
 var jwt = require('jsonwebtoken');
 var config = require('../config/config.js');
 var shortid = require('shortid');
@@ -16,17 +17,18 @@ module.exports = {
     }, function(err, faculty) {
       if (err) throw err;
       Course.find({
-        faculties: {
-          "$in": [faculty.name]
-        }
+        'faculty' : faculty.name
       }, function(err, courselist) {
         if (err) throw err;
-        if (courselist[0] == undefined || courselist == null) failureResponse(req, res, 'No alloted course found!');
+        if (courselist[0] == undefined || courselist == null) res.render('faculty/course', {
+          faculty : req.user,
+          courses : null,
+          alertMessage : "No registered course found"
+        })
         else {
-          res.json({
-            status: 1,
+          res.render('faculty/course', {
             courses: courselist,
-            newToken: req.token
+            faculty : req.user
           });
         }
       });
@@ -40,26 +42,22 @@ module.exports = {
       if (err) throw err;
       Course.findOne({
         'code': req.body.code,
-        faculties: {
-          "$in": [
-            faculty.name
-          ]
-        }
+        'facultyName' : faculty.name,
+        'type' : req.body.type
       }, function(err, course) {
         if (err) throw err;
         if (!course) failureResponse(req, res, 'No course found with this code.');
         else {
           var token = {
             course: req.body.code,
+            type : req.body.type,
             token: shortid.generate()
           };
           faculty.tokens.push(token);
           faculty.save(function(err) {
             if (err) throw err;
             res.json({
-              status: 1,
-              accessToken: token,
-              newToken: req.token
+              accessToken: token
             });
           });
         }
@@ -179,25 +177,11 @@ module.exports = {
           if (err) throw err;
           if (!messages || messages[0] == undefined) failureResponse(req, res, 'No messages');
           else {
-            var i = 0;
-            for (i = 0; i < messages.length; i++) {
-              Student.findOne({
-                'regno': messages[i].from
-              }, function(err, student) {
-                if (err) throw err;
-                else {
-                  messages[i].studentName = student.name;
-                }
-              });
-            }
-            while (i >= messages.length) {
               res.json({
                 status: 1,
                 messages: messages,
                 newToken: req.token
               });
-              break;
-            }
           }
         });
       }
@@ -227,6 +211,7 @@ module.exports = {
             }
             newMessage = new Message();
             newMessage.from = faculty.empid;
+            newMessage.fromName = faculty.name;
             newMessage.to = to;
             newMessage.date = req.body.date;
             newMessage.message = req.body.message;
@@ -234,8 +219,7 @@ module.exports = {
               if (err) throw err;
               res.json({
                 status: 1,
-                message: 'Message Sent',
-                newToken: req.token
+                message: 'Message Sent'
               });
             });
           }
@@ -252,6 +236,7 @@ module.exports = {
       else {
         newMessage = new Message();
         newMessage.from = faculty.empid;
+        newMessage.fromName = faculty.name;
         newMessage.to.push(req.body.to);
         newMessage.date = req.body.date;
         newMessage.message = req.body.message;
@@ -259,8 +244,7 @@ module.exports = {
           if (err) throw err;
           res.json({
             status: 1,
-            message: 'Message sent Succesfully!',
-            newToken: req.token
+            message: 'Message sent Succesfully!'
           });
         });
       }
@@ -436,9 +420,9 @@ module.exports = {
             quiz.open = true;
             quiz.save(function(err) {
               res.json({
-                status : 1,
-                message : 'Quiz is now Live!',
-                newToken : req.token
+                status: 1,
+                message: 'Quiz is now Live!',
+                newToken: req.token
               });
             });
           }
@@ -461,13 +445,32 @@ module.exports = {
             quiz.open = false;
             quiz.save(function(err) {
               res.json({
-                status : 1,
-                message : 'Quiz is now closed!',
-                newToken : req.token
+                status: 1,
+                message: 'Quiz is now closed!',
+                newToken: req.token
               });
             });
           }
         });
+      }
+    });
+  },
+
+  postMarks: function(req, res, emp_id) {
+    Faculty.findOne({
+      'empid': emp_id
+    }, function(err, faculty) {
+      if (err) throw err;
+      else {
+        Student.findOne({
+          'regno' : req.body.regno
+        }, function(err, student) {
+          if(err) throw err;
+          if(!student) failureResponse(req, res, 'Student not registered!');
+          else {
+            Marks.find()
+          }
+        })
       }
     });
   }

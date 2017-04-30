@@ -1,0 +1,88 @@
+<% include header.ejs %>
+  <div id="page-wrapper">
+    <div class="container-fluid">
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-lg-12">
+          <% if(alertMessage.length > 0) { %>
+          <div class="alert alert-danger"><%= alertMessage %></div>
+          <% } if(quiz != null) { %>
+
+          <h1 class="page-header"><%= quiz.name %></h1>
+          <h3><strong>Time remaining : </strong><span id="timer"></span></h3>
+        </div>
+      </div>
+      <!-- /.row -->
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12"><br>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="media well">
+                  <div class="media-body">
+                    <div class="container-fluid bg-info">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h3><span class="label label-warning" id="qid"></span> <span  id="question" questionId="<%= quiz.questionIds[0].questionId %>">Loading Question. Please Wait</span></h3>
+                          </div>
+                          <div class="modal-body">
+                            <div class="col-xs-3 col-xs-offset-5">
+                              <div id="loadbar" style="display: none;">
+                                <div class="blockG" id="rotateG_01"></div>
+                                <div class="blockG" id="rotateG_02"></div>
+                                <div class="blockG" id="rotateG_03"></div>
+                                <div class="blockG" id="rotateG_04"></div>
+                                <div class="blockG" id="rotateG_05"></div>
+                                <div class="blockG" id="rotateG_06"></div>
+                                <div class="blockG" id="rotateG_07"></div>
+                                <div class="blockG" id="rotateG_08"></div>
+                              </div>
+                            </div>
+                            <div class="quiz" id="quiz" data-toggle="buttons"></div>
+                          </div>
+                          <div class="modal-footer text-muted">
+                            <span id="answer"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <ul class="pagination">
+                  <% for(i=0; i < quiz.numberOfQuestions; i++) { %>
+                    <li>
+                      <a href="#" id="<%= i+1 %>" onclick="nextQuestion(this.id);">
+                        <%= i+1 %>
+                      </a>
+                    </li>
+                    <% } %>
+                      <li>
+                        <a href="#" onclick="confirmSubmit();">Submit</a>
+                      </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+  <script type="text/javascript">
+  var quizId = "<%= quiz.quizId %>";
+  var numberOfQuestions = "<%= quiz.numberOfQuestions %>";
+  var questionIds = {};
+  <% for(i = 0; i < quiz.numberOfQuestions; i++) { %>
+    questionIds[<%= i %>] = "<%= quiz.questionIds[i].questionId %>";
+  <% } %>
+  var duration = <%= quiz.duration %>;
+  <% } %>
+  </script>
+  <script src="/js/quiz.js" charset="utf-8"></script>
+    </body>
+
+    </html>

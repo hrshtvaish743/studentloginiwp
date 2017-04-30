@@ -1,0 +1,72 @@
+<% include header.ejs %>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Send Message to Faculty</h1>
+    </div>
+  </div>
+  <!-- /.row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-10">
+            <div class="well well-sm">
+              <div class="row">
+                <div class="col-sm-6 col-md-12">
+                  <div id="response" class="btn-success"></div>
+                  <form id="newmessage" class="text-center" onsubmit="return(sendMessage());">
+                    <label>To : </label>
+                    <select id="to" class="form-control" name="to" required>
+                          <option value="" selected></option>
+                          <% for(i = 0; i < student.courses.length; i++) { %>
+                            <option class="form-group" value="<%= student.courses[i].facultyId %>"><%= student.courses[i].courseFaculty %></option>
+                          <% } %>
+                        </select>
+                    <label>Message : </label>
+                    <textarea class="form-control" id="message" name="message" rows="8" cols="80" required="You should type a message"></textarea>
+                    <br>
+                    <button type="submit" class="btn btn-default" name="button">Send Message</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- /.container-fluid -->
+  </div>
+  <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+  <% include footer.ejs %>
+    <script type="text/javascript">
+      function sendMessage() {
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:3000/student/sendmessage",
+          "method": "POST",
+          "headers": {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "data": {
+            "to": $('#to').val(),
+            "message": $('#message').val()
+          }
+        }
+        console.log(settings);
+        $.ajax(settings).done(function(response) {
+          alert(response.message);
+          $('#newmessage').trigger("reset");
+          console.log(response);
+        });
+
+        return false;
+      }
+    </script>
+    </body>
+
+    </html>
